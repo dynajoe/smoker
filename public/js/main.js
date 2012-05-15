@@ -2,30 +2,31 @@
 
   var socket = io.connect('http://localhost:3000');
   
+  socket.on('temperature', function(data) {
+    var time = (new Date()).getTime();
+    var temp = parseFloat(data.value);
+
+    chart.series[0].addPoint({x: time, y: temp});      
+  });
+
   Highcharts.setOptions({
     global: {
-        useUTC: false
+      useUTC: false
     }
   });
   
   var now = (new Date()).getTime() - 5000;
 
-  window.chart = new Highcharts.Chart({
+  var chart = new Highcharts.Chart({
     chart: {
       renderTo: 'temperature',
       type: 'line',
+      animation: false,
       marginRight: 10,
       zoomType: 'x',
       events: {
         load: function() {
-          var series = this.series[0];
-
-          socket.on('temperature', function(data) {
-            var time = (new Date()).getTime();
-            var temp = parseFloat(data.value);
-
-            series.addPoint({x: time, y: temp});      
-          });
+          socket.emit('pump', { rate: 20 });
         }
       }
     },
@@ -35,29 +36,29 @@
     },
 
     xAxis: {
-        type: 'datetime',
-        tickPixelInterval: 150,
-        min: now,
-        minRange: 20 * 1000
+      type: 'datetime',
+      tickPixelInterval: 150,
+      min: now,
+      minRange: 20 * 1000
 
     },
-    
+
     plotOptions: {
       series: {
-          marker: {
-              enabled: false,
-              states: {
-                  hover: {
-                      enabled: true
-                  }
-              }
+        marker: {
+          enabled: false,
+          states: {
+            hover: {
+              enabled: true
+            }
           }
+        }
       }
     },
 
     yAxis: {
       title: {
-        text: 'Value'
+        text: 'Temperature'
       },
       max: 160,
       min: 60,
@@ -76,28 +77,28 @@
 
           var data = [],
 
-              time = (new Date()).getTime(),
+          time = (new Date()).getTime(),
 
-              i;
+          i;
 
 
 
           for (i = -19; i <= 0; i++) {
 
-              data.push({
+            data.push({
 
-                  x: time + i * 1000,
+              x: time + i * 1000,
 
-                  y: Math.random()
+              y: Math.random()
 
-              });
+            });
 
           }
 
           return data;
 
-      })()
-    }]
+        })()
+      }]
 
-  });
+    });
 });
