@@ -6,9 +6,8 @@ init = (app, io) ->
   app.get '/', (req, res) ->
     res.render 'index'
 
-  io.sockets.on 'connection', (socket) ->
-    serialPort.on 'data', (d) ->
-      io.sockets.emit 'temperature', value: d
+  serialPort.on 'data', (d) ->
+    io.sockets.emit 'temperature', value: d
 
 module.exports = 
   use: (app) ->

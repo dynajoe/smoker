@@ -15,11 +15,18 @@
       events: {
         load: function() {
           var series = this.series[0];
+          var lastTime = (new Date()).getTime();
 
           socket.on('temperature', function(data) {
             var time = (new Date()).getTime();
             var temp = data.value;
-            series.addPoint([time, temp], true, true);
+
+            if (lastTime + 5000 > time) {
+              console.log(time + " " + temp);
+              lastTime = time;
+              series.addPoint([time, temp], true, true);
+            }
+            
           });
         }
       }
