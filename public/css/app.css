@@ -1,0 +1,8 @@
+body {
+  font-family: 'Helveteca Neue', arial, sans-serif;
+  color: #fff;
+}
+#temperature {
+  width: 800px;
+  height: 350px;
+}
