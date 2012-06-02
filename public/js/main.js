@@ -7,6 +7,9 @@
     var temp = parseFloat(data.value);
 
     chart.series[0].addPoint({x: time, y: temp});      
+
+    $("#current h3").text(temp + "º F");
+
   });
 
   Highcharts.setOptions({
@@ -26,7 +29,7 @@
       zoomType: 'x',
       events: {
         load: function() {
-          socket.emit('pump', { rate: 20 });
+          socket.emit('pump', { rate: 5 });
         }
       }
     },

@@ -1,8 +1,13 @@
 body {
   font-family: 'Helveteca Neue', arial, sans-serif;
-  color: #fff;
 }
 #temperature {
   width: 800px;
   height: 350px;
+}
+#current {
+  float: right;
+}
+#current h3 {
+  font-size: 100px;
 }
