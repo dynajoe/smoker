@@ -6,9 +6,9 @@ void setup()
 
 void loop()
 {
-   Serial.println(GetTemperature(A4, 145800.0, 5.0, 225228.0, 295.7, 3961.07));
+   Serial.println(GetTemperature(A4, 105000.0, 5.0, 225228.0, 295.7, 3961.07));
    
-   delay(100);
+   delay(150);
 }
 
 float GetTemperature(int pin, float divider, float vIn, float r0, float t0, float b)
