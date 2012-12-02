@@ -1,3 +1,4 @@
+#include "Arduino.h"
 #include <Servo.h> 
 #include <LiquidCrystal.h>
 
@@ -23,24 +24,20 @@ void setup()
 }
 
 
-double GetTemperature(int pin, double divider, double vIn)
+float GetTemperature(int pin, float divider, float vIn, float r0, float t0, float b)
 {
-   double voltage = ReadVoltage(pin, vIn);
-   double resistance = GetResistance(divider, vIn, voltage);
-
-   double A = -0.0000866368; 
-   double B = 0.000288304;
-   double C = -.0000000587677;
+   float voltage = ReadVoltage(pin, vIn);
+   float resistance = GetResistance(divider, voltage);
+  
+   float lnR = log(resistance / r0);
    
-   double lnR = log(resistance);
-   double tempC =  (1.0 / (A + (B * lnR) + (C * (lnR * lnR * lnR))) - 273.15);
-
-   double tempF = (tempC *  9.0) / 5.0 + 32.0;
+   float tempC = (1.0 / ((1.0 / t0) + (lnR / b))) - 273.15;
+   float tempF = (tempC *  9.0) / 5.0 + 32.0;
   
    return tempF;
  }
  
- double ReadVoltage(int pin, double vIn)
+ float ReadVoltage(int pin, float vIn)
  {
    int sum = 0;
    
@@ -49,19 +46,19 @@ double GetTemperature(int pin, double divider, double vIn)
       sum += analogRead(pin);   
    }
    
-   double avgOut = sum / 5.0;
+   float avgOut = sum / 5.0;
    
    return (avgOut / 1023.0) * vIn;  
  }
 
-double GetResistance(double divider, double vIn, double voltage)
+float GetResistance(float divider, float voltage)
 {
-  return divider * ((vIn / voltage) - 1);
+  return divider * ((5.0 / voltage) - 1);
 }
 
 void loop()
 {
-   double temperature = GetTemperature(A1, 100500.0, 4.85);
+   float temperature = GetTemperature(A1, 100500.0, 4.85, 225228.0, 295.7, 3961.07);
    
    Serial.println(temperature);
    unsigned long now = millis();
@@ -101,3 +98,24 @@ void loop()
    
    delay(1000);
 }
+extern "C" void __cxa_pure_virtual() { while (1) ; }
+#include <Arduino.h>
+
+int main(void)
+{
+	init();
+
+#if defined(USBCON)
+	USBDevice.attach();
+#endif
+	
+	setup();
+    
+	for (;;) {
+		loop();
+		if (serialEventRun) serialEventRun();
+	}
+        
+	return 0;
+}
+
