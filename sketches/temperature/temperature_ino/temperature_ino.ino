@@ -16,9 +16,9 @@ double GetTemperature(int pin, double divider, double vIn)
    double voltage = ReadVoltage(pin, vIn);
    double resistance = GetResistance(divider, vIn, voltage);
 
-   double A = -0.0000866368; 
-   double B = 0.000288304;
-   double C = -.0000000587677;
+   double A = -0.487338; 
+   double B = 0.0785121;
+   double C = -.00029874;
    
    double lnR = log(resistance);
    double tempC =  (1.0 / (A + (B * lnR) + (C * (lnR * lnR * lnR))) - 273.15);
