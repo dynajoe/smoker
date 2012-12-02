@@ -1,27 +1,15 @@
-#include <Servo.h> 
-#include <LiquidCrystal.h>
-
-Servo powerServo;
-float desiredTemp = 240;
-float on = 30;
-float off = 60.0;
-LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
-int lastChange = 0;
-float state = off;
+int desiredTemp = 240;
+boolean isOn = false;
+int relayPin = 11;
+int threshold = 5;
 
 void setup()
 {  
     Serial.begin(9600);  
-    
-    lcd.begin(16,2);
-    lcd.clear();    
-   
     //thermometer
     pinMode(A1, INPUT);
-   
-    powerServo.attach(14);
+    pinMode(relayPin, OUTPUT);
 }
-
 
 double GetTemperature(int pin, double divider, double vIn)
 {
@@ -61,43 +49,65 @@ double GetResistance(double divider, double vIn, double voltage)
 
 void loop()
 {
-   double temperature = GetTemperature(A1, 100500.0, 4.85);
-   
-   Serial.println(temperature);
-   unsigned long now = millis();
-   
-   unsigned long sinceLastChange = now - lastChange;
-   boolean change = false;
-   
-   if (sinceLastChange > 5000) 
-   {
-     //if the temperature is too low and the burner is not on
-     if (temperature < desiredTemp && state != on) 
-     {
-       powerServo.write(on);  
-       state = on;
-       change = true;
-     }//If the temperature is greater than 5 over the desired temp turn the burner off
-     else if (temperature > (desiredTemp + 5) && state == on)
-     {
-       powerServo.write(off);
-       state = off;
-       change = true;
-     }  
+   if (Serial.available() > 0) {
      
-     if (change) {
-       lastChange = now;
+     delay(5);
+     
+     char command = Serial.read(); 
+     
+     if (command == 's' || command == 't') { 
+      
+       int bytes = Serial.available();
+       char input[bytes + 1];
+       
+       for (int i = 0; i < bytes; i++) {
+         input[i] = Serial.read();
+       }
+       input[bytes] = '\0';
+       
+       int value = atoi(input);
+       
+       if (command == 's') {
+         desiredTemp = value;
+       } else if (command == 't') {
+         threshold = value;
+       }
      }
    }
-  
-   lcd.setCursor(0, 0);
-   lcd.print(now / 1000L);
-   lcd.print(" seconds");   
-   lcd.setCursor(0, 1);
-   lcd.print((int) temperature);
-   lcd.print(state == on ? " on " : " off ");
-   lcd.print(sinceLastChange / 1000L);
-   lcd.print(" ago");
+
+   double temperature = GetTemperature(A1, 100000.0, 5.0);
    
-   delay(1000);
+   unsigned long now = millis();
+ 
+   //if the temperature is too low and the burner is not on
+   if (temperature < desiredTemp) 
+   {
+     digitalWrite(relayPin, HIGH);
+     isOn = true;
+   }
+   else if (temperature > desiredTemp + threshold)
+   {
+     digitalWrite(relayPin, LOW);
+     isOn = false;
+   }
+   
+   Serial.print("Temp: ");
+   Serial.println((int) temperature);
+   
+   Serial.print("Target: ");
+   Serial.println(desiredTemp);
+  
+   Serial.print("Thresh: ");
+   Serial.println(threshold);
+   
+   Serial.print("State: ");
+   Serial.println(isOn);
+   
+   Serial.print("Time: ");
+   Serial.println(now / 1000L);
+   
+   Serial.println("====");
+   
+   delay(2000);
 }
+
