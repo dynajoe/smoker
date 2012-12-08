@@ -9,3 +9,21 @@ block content
    #current
      h3 0.0F
    #temperature
+
+   form#command-form
+      input#command(type='text')
+      input(type='submit', value='Send')
+
+   ul#info
+      li
+         h2 Target: 
+            span.target
+      li 
+         h2 State: 
+            span.state
+      li 
+         h2 Run time: 
+            span.run-time
+      li 
+         h2 Threshold: 
+            span.thresh

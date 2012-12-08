@@ -1,5 +1,11 @@
  $(document).ready(function() {
 
+  $('#command-form').submit(function (e) {
+    socket.emit('command', $('#command').val());
+    $('#command').val('')
+    return false;
+  });
+
   var socket = window.socket = io.connect('http://localhost:3000');
   var maxTemp = 260;
   var medTemp = 140;
@@ -7,6 +13,22 @@
 
   socket.on('history', function (data) {
     console.log(data);
+  });
+  
+  socket.on('target', function (data) {
+    $('.target').html(data);
+  });
+
+  socket.on('thresh', function (data) {
+    $('.thresh').html(data);
+  });
+
+  socket.on('time', function (data) {
+    $('.run-time').html(Math.floor(data / 60) + ' minutes');
+  });
+
+  socket.on('state', function (data) {
+    $('.state').html(data == '1' ? 'On' : 'Off');
   });
 
   socket.on('temp', function(data) {
