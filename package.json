@@ -2,14 +2,11 @@
   "name": "smoker-control",
   "version": "0.0.1",
   "dependencies": {
-    "express": "~v2.5.6",
-    "coffee-script": "~v1.2.0",
-    "clone": "v0.0.4",
-    "jade": "~v0.20.0",
-    "stylus": "~v0.22.5"
-  },
-
-  "scripts": {
-    "test": "make test"
+    "express": "*",
+    "jade": "*",
+    "stylus": "*",
+    "socket.io": "*",
+    "connect-assets": "*",
+    "serialport": "*"
   }
 }

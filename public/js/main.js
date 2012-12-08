@@ -1,14 +1,21 @@
  $(document).ready(function() {
 
-  var socket = io.connect('http://localhost:3000');
-  
-  socket.on('temperature', function(data) {
-    var time = (new Date()).getTime();
-    var temp = parseFloat(data.value);
+  var socket = window.socket = io.connect('http://localhost:3000');
+  var maxTemp = 260;
+  var medTemp = 140;
+  var minTemp = 70;
 
-    chart.series[0].addPoint({x: time, y: temp});      
+  socket.on('history', function (data) {
+    console.log(data);
+  });
 
-    $("#current h3").text(temp + "º F");
+  socket.on('temp', function(data) {
+    var series = chart.series[0];
+    var shift = series.data.length > 60;
+
+    series.addPoint({x: data.time, y: parseFloat(data.temp) }, true, shift);     
+
+    $("#current h3").text(data.temp + "º F");
 
   });
 
@@ -20,18 +27,12 @@
   
   var now = (new Date()).getTime() - 5000;
 
-  var chart = new Highcharts.Chart({
+  var chart = window.chart = new Highcharts.Chart({
     chart: {
       renderTo: 'temperature',
-      type: 'line',
-      animation: false,
-      marginRight: 10,
-      zoomType: 'x',
-      events: {
-        load: function() {
-          socket.emit('pump', { rate: 5 });
-        }
-      }
+      defaultSeriesType: 'spline',
+      type: 'area',
+      zoomType: 'x'
     },
 
     title: {
@@ -42,66 +43,41 @@
       type: 'datetime',
       tickPixelInterval: 150,
       min: now,
-      minRange: 20 * 1000
-
+      maxZoom: 60 * 1000
     },
 
     plotOptions: {
-      series: {
-        marker: {
-          enabled: false,
-          states: {
-            hover: {
-              enabled: true
-            }
+      area: {
+          fillColor: {
+              linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
+              stops: [
+                  [0, '#D90000'],
+                  [1, '#CAD4FA']
+              ]
           }
         }
-      }
     },
-
     yAxis: {
       title: {
         text: 'Temperature'
       },
-      max: 160,
-      min: 60,
-      plotLines: [{
-        value: 0,
-        width: 1,
-        color: '#808080'
-      }]
+      max: maxTemp,
+      min: minTemp
     },
 
     series: [{
-      name: 'temp',
-      data:  (function() {
-
-          // generate an array of random data
-
-          var data = [],
-
-          time = (new Date()).getTime(),
-
-          i;
-
-
-
-          for (i = -19; i <= 0; i++) {
-
-            data.push({
-
-              x: time + i * 1000,
-
-              y: Math.random()
-
-            });
-
+      name: 'Meat Level',
+      color: 'red',
+      data: [],
+      pointInterval: 1000,
+      marker: {
+        enabled: false,
+        states: {
+          hover: {
+            enabled: true
           }
-
-          return data;
-
-        })()
-      }]
-
-    });
+        }
+      }
+    }]
+  });
 });

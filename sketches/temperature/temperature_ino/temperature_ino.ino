@@ -1,50 +1,20 @@
+#include "max6675.h"
+
 int desiredTemp = 240;
 boolean isOn = false;
 int relayPin = 11;
 int threshold = 5;
+int thermoDO = 10;
+int thermoCS = 8;
+int thermoCLK = 9;
+
+MAX6675 thermocouple(thermoCLK, thermoCS, thermoDO);
 
 void setup()
 {  
-    Serial.begin(9600);  
-    //thermometer
-    pinMode(A1, INPUT);
+    Serial.begin(57600);  
+    delay(500);
     pinMode(relayPin, OUTPUT);
-}
-
-double GetTemperature(int pin, double divider, double vIn)
-{
-   double voltage = ReadVoltage(pin, vIn);
-   double resistance = GetResistance(divider, vIn, voltage);
-
-   double A = -0.487338; 
-   double B = 0.0785121;
-   double C = -.00029874;
-   
-   double lnR = log(resistance);
-   double tempC =  (1.0 / (A + (B * lnR) + (C * (lnR * lnR * lnR))) - 273.15);
-
-   double tempF = (tempC *  9.0) / 5.0 + 32.0;
-  
-   return tempF;
- }
- 
- double ReadVoltage(int pin, double vIn)
- {
-   int sum = 0;
-   
-   for (int i = 0; i < 5; i++)
-   {
-      sum += analogRead(pin);   
-   }
-   
-   double avgOut = sum / 5.0;
-   
-   return (avgOut / 1023.0) * vIn;  
- }
-
-double GetResistance(double divider, double vIn, double voltage)
-{
-  return divider * ((vIn / voltage) - 1);
 }
 
 void loop()
@@ -75,9 +45,9 @@ void loop()
      }
    }
 
-   double temperature = GetTemperature(A1, 100000.0, 5.0);
+   double temperature = thermocouple.readFarenheit();
    
-   unsigned long now = millis();
+  unsigned long now = millis();
  
    //if the temperature is too low and the burner is not on
    if (temperature < desiredTemp) 
