@@ -6,22 +6,53 @@
     return false;
   });
 
-  var socket = window.socket = io.connect('http://localhost:3000');
+  var socket = window.socket = io.connect();
   var maxTemp = 260;
   var medTemp = 140;
-  var minTemp = 70;
+  var minTemp = 160;
+  var target = 240;
+  var thresh = 5;
+  var getHistory = window.getHistory = function () {
+    socket.emit('history', function (data) {
+
+    });
+  };
+
 
   socket.on('history', function (data) {
-    console.log(data);
+    console.log(JSON.stringify(data));
   });
   
   socket.on('target', function (data) {
+    target = parseInt(data);
     $('.target').html(data);
+    
+    updateTargetBand();
   });
 
   socket.on('thresh', function (data) {
+    thresh = parseInt(data);
     $('.thresh').html(data);
+    
+    updateTargetBand();
   });
+  
+  var updateTargetBand = function () {
+    chart.series[0].yAxis.removePlotBand('target');
+
+    chart.series[0].yAxis.addPlotBand({ 
+        id: 'target',
+        from: target,
+        to: target + thresh,
+        color: 'yellow',
+        label: {
+            text: 'Target Temperature',
+            style: {
+                color: 'black'
+            }
+        }
+    });
+  };
 
   socket.on('time', function (data) {
     $('.run-time').html(Math.floor(data / 60) + ' minutes');
@@ -33,9 +64,9 @@
 
   socket.on('temp', function(data) {
     var series = chart.series[0];
-    var shift = series.data.length > 60;
+    var shift = series.data.length > 500;
 
-    series.addPoint({x: data.time, y: parseFloat(data.temp) }, true, shift);     
+    series.addPoint({x: data.time, y: parseFloat(data.temp) }, true);     
 
     $("#current h3").text(data.temp + "º F");
 
