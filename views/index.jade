@@ -2,28 +2,39 @@ extends layout
 
 block scripts
    script(src='/socket.io/socket.io.js')
-   script(src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js", type="text/javascript")
-   script(src="/js/highcharts.js", type="text/javascript")
-   script(src="/js/main.js", type="text/javascript")
+   script(src='/js/d3.js', type='text/javascript')
+   
+   script(src='/js/jquery.js', type='text/javascript')
+   script(src='/js/graph.js', type='text/javascript')
+   script(src='/js/main.js', type='text/javascript')
+
 block content
-   #current
-     h3 0.0F
-   #temperature
+   .container
+      .row
+         .span3
+            ul.values
+               li
+                  h3 Smoker Temp 
+                     span.label.burner-state
 
-   form#command-form
-      input#command(type='text')
-      input(type='submit', value='Send')
+                  .current.well-large.well
+                     span.temp
+                  
+               li
+                  h3 Outside Temp
+                  .external-temp.well.well-large
+               
+               li
+                  h3 Current Time
+                  .current-time.well.well-large  
 
-   ul#info
-      li
-         h2 Target: 
-            span.target
-      li 
-         h2 State: 
-            span.state
-      li 
-         h2 Run time: 
-            span.run-time
-      li 
-         h2 Threshold: 
-            span.thresh
+            .clear
+               
+            form
+               fieldset
+               input.command(type='text', placeholder='Send a command')
+            
+         .span9.graphs
+            span#twomin-graph.graph
+            span#tenmin-graph.graph.split
+            span#overall-graph.graph.split

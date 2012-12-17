@@ -1,13 +1,95 @@
 body {
-  font-family: 'Helveteca Neue', arial, sans-serif;
+  font: 10px sans-serif;
+  margin: 0;
 }
-#temperature {
-  width: 800px;
-  height: 350px;
+.clear {
+  clear: both;
 }
-#current {
-  float: right;
+path.line {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1.5px;
 }
-#current h3 {
-  font-size: 100px;
+path.area {
+  fill: #e7e7e7;
+}
+.container-fluid {
+  margin-top: 20px;
+}
+div.well-large {
+  text-align: center;
+  font-size: 20px;
+  padding: 20px;
+}
+div.burner-state.well {
+  text-align: center;
+  font-size: 15px;
+  padding: 5px;
+  margin-top: -10px;
+}
+.values {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+.values h3 {
+  font-size: 20px;
+  margin: 0;
+}
+.values li {
+  clear: left;
+  margin: 0;
+  padding: 0;
+  margin-bottom: 30px;
+}
+.values li p.high {
+  background-color: #f00;
+}
+.values li p.low {
+  background-color: #ff0;
+}
+.values li p.normal {
+  background-color: #008000;
+}
+.command {
+  margin-top: 20px;
+  width: 95%;
+}
+.graphs {
+  margin-top: 15px;
+}
+.graphs .graph {
+  margin-bottom: 20px;
+}
+.graphs .graph .label {
+  fill: #666;
+  font-weight: normal;
+}
+.graphs .graph .split {
+  float: left;
+}
+.title {
+  font-weight: bold;
+  font-size: 15px;
+}
+.axis {
+  shape-rendering: crispEdges;
+}
+.x.axis line {
+  stroke: #000;
+}
+.x.axis path {
+  fill: none;
+  stroke: #000;
+}
+.y.axis line,
+.y.axis path {
+  fill: none;
+  stroke: #000;
+}
+dl.info dt {
+  font-size: 120%;
+}
+dl.info dd {
+  font-size: 100%;
 }

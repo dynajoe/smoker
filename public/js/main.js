@@ -1,136 +1,107 @@
- $(document).ready(function() {
-
-  $('#command-form').submit(function (e) {
-    socket.emit('command', $('#command').val());
-    $('#command').val('')
-    return false;
-  });
+window.onload = function() {
 
   var socket = window.socket = io.connect();
-  var maxTemp = 260;
-  var medTemp = 140;
-  var minTemp = 160;
-  var target = 240;
-  var thresh = 5;
-  var getHistory = window.getHistory = function () {
-    socket.emit('history', function (data) {
+  var lastPoint = null;
 
-    });
+  var smoker = {
+    data: [],
+    targetTemp: 240,
+    tempThreshold: 5,
+    begin: null
   };
 
-
-  socket.on('history', function (data) {
-    console.log(JSON.stringify(data));
-  });
-  
-  socket.on('target', function (data) {
-    target = parseInt(data);
-    $('.target').html(data);
-    
-    updateTargetBand();
-  });
-
-  socket.on('thresh', function (data) {
-    thresh = parseInt(data);
-    $('.thresh').html(data);
-    
-    updateTargetBand();
-  });
-  
-  var updateTargetBand = function () {
-    chart.series[0].yAxis.removePlotBand('target');
-
-    chart.series[0].yAxis.addPlotBand({ 
-        id: 'target',
-        from: target,
-        to: target + thresh,
-        color: 'yellow',
-        label: {
-            text: 'Target Temperature',
-            style: {
-                color: 'black'
-            }
-        }
-    });
-  };
-
-  socket.on('time', function (data) {
-    $('.run-time').html(Math.floor(data / 60) + ' minutes');
-  });
-
-  socket.on('state', function (data) {
-    $('.state').html(data == '1' ? 'On' : 'Off');
-  });
-
-  socket.on('temp', function(data) {
-    var series = chart.series[0];
-    var shift = series.data.length > 500;
-
-    series.addPoint({x: data.time, y: parseFloat(data.temp) }, true);     
-
-    $("#current h3").text(data.temp + "º F");
-
-  });
-
-  Highcharts.setOptions({
-    global: {
-      useUTC: false
+  var getTempColor = function (temp) {
+    if (temp > 240) {
+      return {background: 'red', foreground: 'white'};
+    } else if (temp <= 240 && temp > 210) {
+      return {background: 'green', foreground: 'white'};
+    } else {
+      return {background: 'yellow', foreground: 'black'};
     }
+  }
+
+  var overall = new Graph({
+    xSeconds: 60 * 60 * 2,
+    title: '2 Hours',
+    width: 350,
+    ticks: 4,
+    container: '#overall-graph',
+    updateInterval: 1000,
+    yRange: [180, 260]
   });
-  
-  var now = (new Date()).getTime() - 5000;
 
-  var chart = window.chart = new Highcharts.Chart({
-    chart: {
-      renderTo: 'temperature',
-      defaultSeriesType: 'spline',
-      type: 'area',
-      zoomType: 'x'
-    },
 
-    title: {
-      text: 'Smoker Temperature'
-    },
-
-    xAxis: {
-      type: 'datetime',
-      tickPixelInterval: 150,
-      min: now,
-      maxZoom: 60 * 1000
-    },
-
-    plotOptions: {
-      area: {
-          fillColor: {
-              linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
-              stops: [
-                  [0, '#D90000'],
-                  [1, '#CAD4FA']
-              ]
-          }
-        }
-    },
-    yAxis: {
-      title: {
-        text: 'Temperature'
-      },
-      max: maxTemp,
-      min: minTemp
-    },
-
-    series: [{
-      name: 'Meat Level',
-      color: 'red',
-      data: [],
-      pointInterval: 1000,
-      marker: {
-        enabled: false,
-        states: {
-          hover: {
-            enabled: true
-          }
-        }
-      }
-    }]
+  var twoMin = new Graph({
+    xSeconds: 120,
+    title: '2 Minutes',
+    width: 700,
+    ticks: 8,
+    container: '#twomin-graph',
+    updateInterval: 1000,
+    yRange: [180, 260]
   });
-});
+
+  var tenMin = new Graph({
+    xSeconds: 60 * 10,
+    title: '10 Minutes',
+    width: 350,
+    ticks: 4,
+    container: '#tenmin-graph',
+    updateInterval: 1000,
+    yRange: [180, 260]
+  });
+
+  var tick = function () {
+    var now = Date.now();
+    var newTemp = Math.round(Math.random() * 50 + 200, 0);
+
+    var newPoint = {
+      time: now,
+      temp: newTemp,
+      isOn: newTemp < 230
+    };
+
+    newPoint.delta = lastPoint != null 
+      ? newPoint.temp - lastPoint.temp 
+      : 0;
+
+    smoker.data.push(newPoint);
+    //the graph is off by a second or so because of animations
+    //this looks better if it seemingly corresponds with the graph shape
+    var tempDisplay = lastPoint == null ? newPoint.temp : lastPoint.temp;
+    var colors = getTempColor(tempDisplay);
+
+    d3.select('.current')
+      .transition()
+      .duration(1000)
+      .style('background-color', colors.background)
+      .style('color', colors.foreground)
+
+    d3.select('.current .temp')
+      .text(tempDisplay + '\u00B0 F');
+
+    d3.select('.current-time')
+      .text(d3.time.format('%H:%M:%S')(new Date()));
+    
+    d3.select('.external-temp')
+      .text('50' + '\u00B0 F')
+
+    d3.select('.burner-state')
+      .style('background-color', newPoint.isOn ? 'Orange' : '#eee')
+      .style('color', newPoint.isOn ? 'White' : 'Black')
+      .text(newPoint.isOn ? 'On' : 'Off');
+
+    overall.update(smoker);
+    twoMin.update(smoker);
+    tenMin.update(smoker);
+
+    lastPoint = newPoint;
+  };
+
+  var evenTime = 1000 - Date.now() % 1000;
+
+  setTimeout(function() { 
+    tick();  
+    setInterval(tick, 1000); 
+  }, evenTime);
+};
