@@ -1,20 +1,20 @@
-var serialport = require('serialport');
-var SerialPort = serialport.SerialPort
+var serialPort = require('serialport');
 var child = require('child_process');
 var collectedData = [];
 var buffer = [];
+var port = null;
 
 child.exec('ls /dev | grep cu.usbserial', function (err, stdout) {
 	
 	var ports = stdout.trim().split('\n');
 
 	if (ports.length > 0) {
-		var serialPort = new SerialPort('/dev/' + ports[0], {
+		port = new serialPort.SerialPort('/dev/' + ports[0], {
 		  baudrate: 9600,
-		  parser: serialport.parsers.readline('\n') 
+		  parser: serialPort.parsers.readline('\n') 
 		});	
 
-		serialPort.on('data', function (data) {
+		port.on('data', function (data) {
 			var parts = data.trim().split(',');
 
 			var point = {
@@ -48,7 +48,9 @@ module.exports = function (app, io) {
 		});
 
 		socket.on('command', function (command) {
-			serialPort.write(command.trim() + '\n');
+			if (!!port) {
+				port.write(command.trim() + '\n');	
+			}
 		});
 	});
 

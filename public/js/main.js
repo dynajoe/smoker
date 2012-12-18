@@ -1,14 +1,32 @@
-window.onload = function() {
+$(document).ready(function() {
 
+  $('form.command').submit(function () {
+    var input = $('.text', this);
+
+    socket.emit('command', input.val());
+
+    input.val('');
+    
+    return false;
+  });
+  
   var socket = window.socket = io.connect();
-  var lastPoint = null;
+  var updateInterval = 1000;
 
-  var smoker = {
+  var smoker = window.smoker = {
     data: [],
     targetTemp: 240,
     tempThreshold: 5,
     begin: null
   };
+
+  socket.on('data', function (data) {
+    smoker.targetTemp = data.target;
+    smoker.tempThreshold = data.threshold;
+    smoker.data = smoker.data.concat(data);
+  });
+
+  var lastPoint = null;
 
   var getTempColor = function (temp) {
     if (temp > 240) {
@@ -26,7 +44,7 @@ window.onload = function() {
     width: 350,
     ticks: 4,
     container: '#overall-graph',
-    updateInterval: 1000,
+    updateInterval: updateInterval,
     yRange: [180, 260]
   });
 
@@ -37,7 +55,7 @@ window.onload = function() {
     width: 700,
     ticks: 8,
     container: '#twomin-graph',
-    updateInterval: 1000,
+    updateInterval: updateInterval,
     yRange: [180, 260]
   });
 
@@ -47,61 +65,44 @@ window.onload = function() {
     width: 350,
     ticks: 4,
     container: '#tenmin-graph',
-    updateInterval: 1000,
+    updateInterval: updateInterval,
     yRange: [180, 260]
   });
 
   var tick = function () {
-    var now = Date.now();
-    var newTemp = Math.round(Math.random() * 50 + 200, 0);
+    var latestData = smoker.data[smoker.data.length - 1]
+    
+    if (!latestData) {
+      return;
+    }
 
-    var newPoint = {
-      time: now,
-      temp: newTemp,
-      isOn: newTemp < 230
-    };
-
-    newPoint.delta = lastPoint != null 
-      ? newPoint.temp - lastPoint.temp 
-      : 0;
-
-    smoker.data.push(newPoint);
-    //the graph is off by a second or so because of animations
-    //this looks better if it seemingly corresponds with the graph shape
-    var tempDisplay = lastPoint == null ? newPoint.temp : lastPoint.temp;
-    var colors = getTempColor(tempDisplay);
+    var colors = getTempColor(latestData.temp);
 
     d3.select('.current')
       .transition()
-      .duration(1000)
+      .duration(updateInterval)
       .style('background-color', colors.background)
       .style('color', colors.foreground)
 
     d3.select('.current .temp')
-      .text(tempDisplay + '\u00B0 F');
+      .text(latestData.temp + '\u00B0 F');
+
+    d3.select('.outside-temp')
+      .text(latestData.outsideTemp + '\u00B0 F');
 
     d3.select('.current-time')
       .text(d3.time.format('%H:%M:%S')(new Date()));
     
-    d3.select('.external-temp')
-      .text('50' + '\u00B0 F')
-
     d3.select('.burner-state')
-      .style('background-color', newPoint.isOn ? 'Orange' : '#eee')
-      .style('color', newPoint.isOn ? 'White' : 'Black')
-      .text(newPoint.isOn ? 'On' : 'Off');
+      .style('background-color', latestData.isOn ? 'Orange' : '#eee')
+      .style('color', latestData.isOn ? 'White' : 'Black')
+      .text(latestData.isOn ? 'On' : 'Off');
 
     overall.update(smoker);
     twoMin.update(smoker);
     tenMin.update(smoker);
-
-    lastPoint = newPoint;
   };
 
-  var evenTime = 1000 - Date.now() % 1000;
-
-  setTimeout(function() { 
-    tick();  
-    setInterval(tick, 1000); 
-  }, evenTime);
-};
+  tick();  
+  setInterval(tick, updateInterval); 
+});

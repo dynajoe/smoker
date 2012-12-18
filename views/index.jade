@@ -22,7 +22,7 @@ block content
                   
                li
                   h3 Outside Temp
-                  .external-temp.well.well-large
+                  .outside-temp.well.well-large
                
                li
                   h3 Current Time
@@ -30,9 +30,9 @@ block content
 
             .clear
                
-            form
+            form.command
                fieldset
-               input.command(type='text', placeholder='Send a command')
+               input.text(type='text', placeholder='Send a command')
             
          .span9.graphs
             span#twomin-graph.graph
