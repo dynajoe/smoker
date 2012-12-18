@@ -98,6 +98,12 @@ $(document).ready(function() {
       .style('color', latestData.isOn ? 'White' : 'Black')
       .text(latestData.isOn ? 'On' : 'Off');
 
+    if (latestData.temp < 180) {
+      twoMin.yRange = [60, 180];
+    } else {
+      twoMin.yRange = [180, 260];
+    }
+    
     overall.update(smoker);
     twoMin.update(smoker);
     tenMin.update(smoker);

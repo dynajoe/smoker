@@ -135,10 +135,15 @@ Graph.prototype.update = function (smoker) {
   var start = now - this.xMilliseconds;
 
   this.x.domain([start, now]);
+  this.y.domain(this.yRange);
 
   this.xAxis.transition()
     .duration(this.updateInterval)
     .ease('linear')
     .call(this.x.axis);
 
+  this.yAxis.transition()
+    .duration(this.updateInterval)
+    .ease('linear')
+    .call(this.y.axis);
 };
