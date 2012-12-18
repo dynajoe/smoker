@@ -169,8 +169,8 @@ void loop()
    Serial.print(',');
    Serial.print((int) threshold);
    Serial.print(',');
-   Serial.print(now / 1000L);
-	Serial.println();
+   Serial.print(now / 1000L);	
+   Serial.println();
 
    delay(delayMs);
 }
