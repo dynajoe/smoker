@@ -1,39 +1,55 @@
 var serialPort = require('serialport');
 var child = require('child_process');
+var os = require('os');
+
 var collectedData = [];
 var buffer = [];
 var port = null;
 
-child.exec('ls /dev | grep cu.usbserial', function (err, stdout) {
-	
-	var ports = stdout.trim().split('\n');
+var getPortConnect = function (callback) {
 
-	if (ports.length > 0) {
-		port = new serialPort.SerialPort('/dev/' + ports[0], {
-		  baudrate: 9600,
-		  parser: serialPort.parsers.readline('\n') 
-		});	
+    if (os.platform() === 'win32') {
+        callback(null, 'COM5');
+        return;
+    }
 
-		port.on('data', function (data) {
-			var parts = data.trim().split(',');
+    child.exec('ls /dev | grep cu.usbserial', function (err, stdout) {
+        var ports = stdout.trim().split('\n');
 
-			var point = {
-				temp: parseInt(parts[0]),
-				outsideTemp: parseInt(parts[1]),
-				isOn: parseInt(parts[2]) === 1,
-				time: Date.now(),
-				threshold: parseInt(parts[4]),
-				target: parseInt(parts[3])
-			};
+        if (ports.length == 0) {
+            console.log('Unable to connect to XBEE!');
+            callback('Unable to connect to xbee.');
+        }
 
-			collectedData.push(point);
-			buffer.push(point);
-		});
-	} else {
-		console.log('Unable to connect to XBEE!');
-	}
+        callback(null, '/dev/' + ports[0]);
+    });
+};
+
+getPortConnect(function (err, port) {
+    if (!port) return;
+    
+    port = new serialPort.SerialPort(port, {
+      baudrate: 9600,
+      parser: serialPort.parsers.readline('\n') 
+    }); 
+
+    port.on('data', function (data) {
+        var parts = data.trim().split(',');
+
+        var point = {
+            temp: parseInt(parts[0]),
+            outsideTemp: parseInt(parts[1]),
+            isOn: parseInt(parts[2]) === 1,
+            time: Date.now(),
+            threshold: parseInt(parts[4]),
+            target: parseInt(parts[3])
+        };
+
+        collectedData.push(point);
+        buffer.push(point);
+    });
 });
-
+    
 module.exports = function (app, io) {
 	io.sockets.on('connection', function (socket) {
 		socket.on('history', function () {
