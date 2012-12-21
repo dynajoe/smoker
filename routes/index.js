@@ -1,7 +1,6 @@
 var serialPort = require('serialport');
 var child = require('child_process');
 var os = require('os');
-
 var collectedData = [];
 var buffer = [];
 var port = null;
@@ -16,11 +15,10 @@ var getPortConnect = function (callback) {
     child.exec('ls /dev | grep cu.usbserial', function (err, stdout) {
         var ports = stdout.trim().split('\n');
 
-        if (ports.length == 0) {
-            console.log('Unable to connect to XBEE!');
+        if (ports.length == 0 || !ports[0]) {
             callback('Unable to connect to xbee.');
+            return;
         }
-
         callback(null, '/dev/' + ports[0]);
     });
 };
@@ -50,7 +48,14 @@ getPortConnect(function (err, port) {
     });
 });
     
-module.exports = function (app, io) {
+module.exports = function (app) {
+
+    var io = app.get('io');
+    var db = app.get('db');
+
+    var smokerData = db.collection('smoker');
+
+
 	io.sockets.on('connection', function (socket) {
 		socket.on('history', function () {
 			socket.emit('history', collectedData);
@@ -75,6 +80,10 @@ module.exports = function (app, io) {
 			io.sockets.emit('data', buffer);
 			buffer = [];
 		}
+
+        smokerData.insert(buffer, function (err) {
+           
+        });
 	}, 2000);
 
    app.get('/', function (req, res) {
