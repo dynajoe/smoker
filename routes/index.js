@@ -23,10 +23,10 @@ var getPortConnect = function (callback) {
     });
 };
 
-getPortConnect(function (err, port) {
-    if (!port) return;
+getPortConnect(function (err, discoveredPort) {
+    if (!discoveredPort) return;
     
-    port = new serialPort.SerialPort(port, {
+    port = new serialPort.SerialPort(discoveredPort, {
       baudrate: 9600,
       parser: serialPort.parsers.readline('\n') 
     }); 
@@ -55,7 +55,6 @@ module.exports = function (app) {
 
     var smokerData = db.collection('smoker');
 
-
 	io.sockets.on('connection', function (socket) {
 		socket.on('history', function () {
 			socket.emit('history', collectedData);
@@ -64,14 +63,13 @@ module.exports = function (app) {
 		socket.on('time', function (clientTime) {
 			var now = Date.now();
 			var diff = clientTime - now;
-
 			socket.emit('time', { time: now, diff: diff });
 		});
 
 		socket.on('command', function (command) {
-			if (!!port) {
-				port.write(command.trim() + '\n');	
-			}
+            if (port) {
+            	port.write(command.trim() + '\n');
+            } 
 		});
 	});
 
