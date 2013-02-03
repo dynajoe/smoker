@@ -57,7 +57,7 @@ module.exports = function (app) {
 
 	io.sockets.on('connection', function (socket) {
 		socket.on('history', function () {
-			socket.emit('history', collectedData);
+			socket.emit('history', collectedData.slice(collectedData.length - 300, collectedData.length));
 		});
 
 		socket.on('time', function (clientTime) {

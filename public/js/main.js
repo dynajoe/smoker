@@ -20,11 +20,17 @@ $(document).ready(function() {
     begin: null
   };
 
+  socket.on('history', function (data) {
+    smoker.data = data;
+  });
+
   socket.on('data', function (data) {
     smoker.targetTemp = data.target;
     smoker.tempThreshold = data.threshold;
     smoker.data = smoker.data.concat(data);
   });
+
+  socket.emit('history');
 
   var lastPoint = null;
 
