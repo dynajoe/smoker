@@ -9,6 +9,7 @@ var Graph = function (options) {
   this.width = options.width;
   this.height = 230 - margin.top - margin.bottom;
   this.ticks = options.ticks;
+  this.sliceLength = options.sliceLength;
   this.initialize();
 };
 
@@ -118,19 +119,25 @@ Graph.prototype.update = function (smoker) {
   var now = Date.now();
   var width = $(this.container + ' svg').width() - this.margin.right;
 
+  if (smoker.data.length > this.sliceLength) {
+    var data = smoker.data.slice(smoker.data.length - this.sliceLength, smoker.data.length);
+  } else {
+    var data = smoker.data;
+  }
+
   d3.selectAll(this.container + ' path.line')
-    .data([smoker.data])
+    .data([data])
     .transition()
       .ease('linear')
       .duration(this.updateInterval)
-      .attr('d', this.line(smoker.data));
+      .attr('d', this.line(data));
 
   d3.selectAll(this.container + ' path.area')
-    .data([smoker.data])
+    .data([data])
     .transition()
       .ease('linear')
       .duration(this.updateInterval)
-      .attr('d', this.area(smoker.data));
+      .attr('d', this.area(data));
   
   var start = now - this.xMilliseconds;
 

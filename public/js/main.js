@@ -38,17 +38,6 @@ $(document).ready(function() {
     }
   }
 
-  var overall = new Graph({
-    xSeconds: 60 * 60 * 2,
-    title: '2 Hours',
-    width: 350,
-    ticks: 4,
-    container: '#overall-graph',
-    updateInterval: updateInterval,
-    yRange: [180, 260]
-  });
-
-
   var twoMin = new Graph({
     xSeconds: 120,
     title: '2 Minutes',
@@ -56,17 +45,19 @@ $(document).ready(function() {
     ticks: 8,
     container: '#twomin-graph',
     updateInterval: updateInterval,
-    yRange: [180, 260]
+    yRange: [180, 260],
+    sliceLength: 60
   });
 
   var tenMin = new Graph({
     xSeconds: 60 * 10,
     title: '10 Minutes',
-    width: 350,
+    width: 700,
     ticks: 4,
     container: '#tenmin-graph',
     updateInterval: updateInterval,
-    yRange: [180, 260]
+    yRange: [180, 260],
+    sliceLength: 300
   });
 
   var tick = function () {
@@ -85,10 +76,13 @@ $(document).ready(function() {
       .style('color', colors.foreground)
 
     d3.select('.current .temp')
-      .text(latestData.temp + '\u00B0 F');
+      .text(latestData.temp + '\u00B0');
+
+    d3.select('.target-temp')
+      .text(latestData.target + '\u00B0');
 
     d3.select('.outside-temp')
-      .text(latestData.outsideTemp + '\u00B0 F');
+      .text(latestData.outsideTemp + '\u00B0');
 
     d3.select('.current-time')
       .text(d3.time.format('%H:%M:%S')(new Date()));
@@ -104,7 +98,6 @@ $(document).ready(function() {
       twoMin.yRange = [180, 260];
     }
     
-    overall.update(smoker);
     twoMin.update(smoker);
     tenMin.update(smoker);
   };
