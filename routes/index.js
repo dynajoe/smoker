@@ -21,7 +21,7 @@ module.exports = function (app) {
 			socket.emit('history', collectedData.slice(startIndex, collectedData.length));
 		});
 
-		socket.on('command', smoker.send);
+		socket.on('command', function (cmd) { smoker.send(cmd); });
 	});
 	
    setInterval(function () {

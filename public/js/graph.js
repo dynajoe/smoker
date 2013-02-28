@@ -7,7 +7,7 @@ var Graph = function (options) {
   this.title = options.title;
   var margin = this.margin = margin = {top: 15, right: 0, bottom: 40, left: 60};  
   this.width = options.width;
-  this.height = 230 - margin.top - margin.bottom;
+  this.height = 280 - margin.top - margin.bottom;
   this.ticks = options.ticks;
   this.sliceLength = options.sliceLength;
   this.initialize();

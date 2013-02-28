@@ -11,13 +11,12 @@ $(document).ready(function() {
   });
   
   var socket = window.socket = io.connect();
-  var updateInterval = 1000;
+  var updateInterval = 2000;
 
   var smoker = window.smoker = {
     data: [],
     targetTemp: 240,
-    tempThreshold: 5,
-    begin: null
+    tempThreshold: 5
   };
 
   socket.on('history', function (data) {
@@ -32,15 +31,13 @@ $(document).ready(function() {
 
   socket.emit('history');
 
-  var lastPoint = null;
-
-  var getTempColor = function (temp) {
-    if (temp > 240) {
-      return {background: 'red', foreground: 'white'};
-    } else if (temp <= 240 && temp > 210) {
-      return {background: 'green', foreground: 'white'};
+  var getTempColor = function (temp, min, max) {
+    if (temp > max) {
+      return { background: 'red', foreground: 'white' };
+    } else if (temp <= max && temp > min) {
+      return { background: 'green', foreground: 'white' };
     } else {
-      return {background: 'yellow', foreground: 'black'};
+      return { background: 'yellow', foreground: 'black' };
     }
   }
 
@@ -65,15 +62,16 @@ $(document).ready(function() {
     yRange: [180, 260],
     sliceLength: 300
   });
-
+  
   var tick = function () {
+
     var latestData = smoker.data[smoker.data.length - 1]
-    
+
     if (!latestData) {
       return;
     }
 
-    var colors = getTempColor(latestData.temp);
+    var colors = getTempColor(latestData.temp, latestData.target, latestData.target + latestData.threshold);
 
     d3.select('.current')
       .transition()
@@ -85,14 +83,11 @@ $(document).ready(function() {
       .text(latestData.temp + '\u00B0');
 
     d3.select('.target-temp')
-      .text(latestData.target + '\u00B0');
+      .text(latestData.target + '\u00B0 - ' + (latestData.target + latestData.threshold) + '\u00B0');
 
     d3.select('.outside-temp')
       .text(latestData.outsideTemp + '\u00B0');
 
-    d3.select('.current-time')
-      .text(d3.time.format('%H:%M:%S')(new Date()));
-    
     d3.select('.burner-state')
       .style('background-color', latestData.isOn ? 'Orange' : '#eee')
       .style('color', latestData.isOn ? 'White' : 'Black')
@@ -110,4 +105,10 @@ $(document).ready(function() {
 
   tick();  
   setInterval(tick, updateInterval); 
+
+  setInterval(function () {
+    d3.select('.current-time')
+      .text(d3.time.format('%H:%M:%S')(new Date()));
+  }, 1000);
+
 });
