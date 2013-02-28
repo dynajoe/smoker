@@ -29,14 +29,12 @@ void processCommands()
 {
    if (Serial.available() > 0) 
    {
-
       delay(50);
 
       char command = Serial.read(); 
 
       if (command == 's' || command == 't'|| command == 'd') 
       { 
-
          int bytes = Serial.available();
          char input[bytes + 1];
 
@@ -77,7 +75,6 @@ byte readSPI()
 
       if (digitalRead(thermoDO)) 
       {
-         //set the bit to 0 no matter what
          d |= (1 << i);
       }
 

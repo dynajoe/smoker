@@ -7,7 +7,6 @@
     "stylus": "*",
     "socket.io": "*",
     "connect-assets": "*",
-    "serialport": "*",
-    "mongodb": "~1.2.6"
+    "serialport": "*"
   }
 }
