@@ -45,8 +45,10 @@ $(document).ready(function() {
         .duration(100)
         .attr("transform", "translate(" + x(0) + ")"); // animate a slide to the left back to x(0) pixels to reveal the new value
     };
+    
+    var socket = io.connect();
 
-    io.emit('getData', function (d) {
+    socket.emit('getData', function (d) {
       console.log(d);
     });
 
