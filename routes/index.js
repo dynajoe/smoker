@@ -1,39 +1,58 @@
-var Smoker = require('../lib/smoker');
+var Max6675 = require('max6675-raspberry-pi');
+var _ = require('underscore');
 
-module.exports = function (app) {
-   var smoker = new Smoker();
-   var collectedData = [];
-   var io = app.get('io');
-   var lastIndex = 0;
-      
-   smoker.initialize(function (err) {
-      if (err) console.log(err);
-   }).on('data', function (data) {
-      collectedData.push(data);
+var sensorA = new Max6675({
+   miso: 0,
+   ss: 12,
+   clk: 3
+});
+
+var sensorB = new Max6675({
+   miso: 0,
+   ss: 2,
+   clk: 3
+});
+
+var io = app.get('io');
+
+io.sockets.on('connection', function (socket) {
+   socket.on('getData', function (since) {
+      var result = null;
+
+      if (!since) {
+         result = {
+            since: data.length > 0 ? data[0].time : new Date().getTime(),
+            data: data
+         };
+      } else {
+         result = { 
+            since: since,
+            data: _.filter(data, function (d) {
+               return d.time > since;
+            })
+         };
+      }
+
+      return socket.emit('data', result);
+   });
+});
+
+var data = [];
+setInterval(function () {
+   var a = sensorA.read();
+   var b = sensorB.read();
+   
+   data.push({
+      a: parseInt(a),
+      b: parseInt(b),
+      time: new Date().getTime()
    });
 
-	io.sockets.on('connection', function (socket) {
-		socket.on('history', function () {
-         var startIndex = collectedData.length - 300;
-         
-         if (startIndex < 0) startIndex = 0;
+}, 1000);
 
-			socket.emit('history', collectedData.slice(startIndex, collectedData.length));
-		});
 
-		socket.on('command', function (cmd) { smoker.send(cmd); });
-	});
-	
-   setInterval(function () {
-      var buffer = collectedData.slice(lastIndex, collectedData.length);
-      
-      if (buffer.length > 0) {
-         io.sockets.emit('data', buffer);
-   		lastIndex = collectedData.length;
-      }
-	}, 2000);
-
+module.exports = function (app) {
    app.get('/', function (req, res) {
-      res.render('index', { title: 'Smoker!' });
+      res.render('index');
    });
 };

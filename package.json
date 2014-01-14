@@ -4,9 +4,10 @@
   "dependencies": {
     "express": "*",
     "jade": "*",
-    "stylus": "*",
     "socket.io": "*",
     "connect-assets": "*",
-    "serialport": "*"
+    "serialport": "*",
+    "nib": "~1.0.2",
+    "stylus": "~0.42.0"
   }
 }

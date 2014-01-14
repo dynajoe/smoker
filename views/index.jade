@@ -9,34 +9,56 @@ block scripts
    script(src='/js/main.js', type='text/javascript')
 
 block content
-   .container
-      .row
-         .span3
-            ul.values
+   .tiles
+      .tile-container.third.tile-a
+         .info
+            ul 
                li
-                  h3 Smoker Temp 
-                     span.label.burner-state
+                  span.temp= parseInt(Math.random() * 100 + 100)
+                  | °
+                  span.title current
+               li
+                  span.temp= parseInt(Math.random() * 100 + 100)
+                  | °
+                  span.title average
+               li.graph-container
+                  .graph
+            .attrs
+               span.name Meat
+               span.goal 180 Max
+            i(class="fa fa-cog")
+      .tile-container.third.tile-b
+         .info
+            ul 
+               li
+                  span.temp= parseInt(Math.random() * 100 + 100)
+                  | °
+                  span.title current
+               li
+                  span.temp= parseInt(Math.random() * 100 + 100)
+                  | °
+                  span.title average
+               li.graph-container
+                  .graph
+            .attrs
+               span.name Meat
+               span.goal 180 Max
+            i(class="fa fa-cog")
+      .tile-container.third.tile-c
+         .info
+            ul 
+               li
+                  span.temp= parseInt(Math.random() * 100 + 100)
+                  | °
+                  span.title current
+               li
+                  span.temp= parseInt(Math.random() * 100 + 100)
+                  | °
+                  span.title average
+               li.graph-container
+                  .graph
+            .attrs
+               span.name Meat
+               span.goal 180 Max
+            i(class="fa fa-cog")
 
-                  .current.well-large.well
-                     span.temp
-               li
-                  h3 Target Temp
-                  .target-temp.well.well-large
-               
-               li
-                  h3 Outside Temp
-                  .outside-temp.well.well-large
-               
-               li
-                  h3 Current Time
-                  .current-time.well.well-large  
-
-            .clear
-               
-            form.command
-               fieldset
-               input.text(type='text', placeholder='Send a command')
-            
-         .span9.graphs
-            span#twomin-graph.graph
-            span#tenmin-graph.graph

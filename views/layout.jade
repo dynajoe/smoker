@@ -1,10 +1,10 @@
 !!! 5
-html(lang="en")
-  head
-    title Smoker Control
-    != css('app')
-    link(rel="stylesheet", href="/css/bootstrap.css")
-    block scripts
-
-  body
-    block content
+html(lang="en", ng-app="")
+   head
+      title Smoker Control
+      link(rel='stylesheet', href='css/app.css', type='text/css')
+      link(rel='stylesheet', href='css/font-awesome.min.css', type='text/css')
+      script(src='js/angular.min.js', type='text/javascript')
+      block scripts
+   body
+      block content

@@ -1,92 +1,20 @@
-body {
-  font: 10px sans-serif;
-  margin: 0;
-}
-.clear {
-  clear: both;
-}
-path.line {
-  fill: none;
-  stroke: #666;
-  stroke-width: 1.5px;
-}
-path.area {
-  fill: #e7e7e7;
-}
-.container-fluid {
-  margin-top: 20px;
-}
-div.well-large {
-  text-align: center;
-  font-size: 20px;
-  padding: 20px;
-}
-span.burner-state {
-  text-align: center;
-  font-size: 15px;
-  padding: 4px 15px;
-  margin-top: -10px;
-}
-.values {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-}
-.values h3 {
-  font-size: 20px;
-  margin: 0;
-}
-.values li {
-  clear: left;
-  margin: 0;
-  padding: 0;
-  margin-bottom: 30px;
-}
-.values li p.high {
-  background-color: #f00;
-}
-.values li p.low {
-  background-color: #ff0;
-}
-.values li p.normal {
-  background-color: #008000;
-}
-.command {
-  margin-top: 20px;
-  width: 95%;
-}
-.graphs {
-  margin-top: 15px;
-}
-.graphs .graph {
-  margin-bottom: 20px;
-}
-.graphs .graph .label {
-  fill: #666;
-  font-weight: normal;
-}
-.title {
-  font-weight: bold;
-  font-size: 15px;
-}
-.axis {
-  shape-rendering: crispEdges;
-}
-.x.axis line {
-  stroke: #000;
-}
-.x.axis path {
-  fill: none;
-  stroke: #000;
-}
-.y.axis line,
-.y.axis path {
-  fill: none;
-  stroke: #000;
-}
-dl.info dt {
-  font-size: 120%;
-}
-dl.info dd {
-  font-size: 100%;
-}
+html,body{background-color:#fcfcfc;font-family:"Helvetica Neue";font-size:18px;margin:0;background-color:#333;padding:0}
+ul{margin:0;padding:0;list-style-type:none}
+.tiles{width:648px;margin:0 auto;overflow:hidden;margin-top:6px}
+.tile-container{float:left;}
+.tile-container.full{width:632px;float:none;clear:both;padding:8px;}
+.tile-container.full div{background-color:#d5694e}
+.tile-container.third{width:200px;padding:8px}
+.tile-container.tile-a .info{background-color:#d5694e}
+.tile-container.tile-b .info{background-color:#8f7bb3}
+.tile-container.tile-c .info{background-color:#65b9b6}
+.info{color:#fcfcfc;text-align:center;font-size:1.5em;background-color:#d5694e;position:relative;}
+.info .fa-cog{position:absolute;right:5px;bottom:5px;font-size:1em}
+.info .attrs{font-size:.4em;text-transform:uppercase;text-align:left;padding:10px;padding-top:0;}
+.info .attrs span{margin-right:10px}
+.info ul{overflow:hidden;padding:10px}
+.info li{float:left;width:50%;padding-bottom:10px}
+.info .title{color:#dedede;display:block;font-size:.6em}
+.info .graph-container{width:180px;height:60px}
+.info .graph{width:100%;height:100%;}
+.info .graph path{stroke:#fff;stroke-width:1;fill:none}
