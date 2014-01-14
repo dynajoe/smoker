@@ -5,9 +5,9 @@
     "express": "*",
     "jade": "*",
     "socket.io": "*",
-    "connect-assets": "*",
-    "serialport": "*",
     "nib": "~1.0.2",
-    "stylus": "~0.42.0"
+    "stylus": "~0.42.0",
+    "max6675-raspberry-pi": "*",
+    "underscore": "~1.5.2"
   }
 }
