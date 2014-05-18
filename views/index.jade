@@ -1,64 +1,21 @@
 extends layout
 
-block scripts
-   script(src='/socket.io/socket.io.js')
-   script(src='/js/d3.js', type='text/javascript')
-   
-   script(src='/js/jquery.js', type='text/javascript')
-   script(src='/js/graph.js', type='text/javascript')
-   script(src='/js/main.js', type='text/javascript')
-
 block content
    .tiles
-      .tile-container.third.tile-a
+      .tile-container.third(ng-repeat="s in sensors" class="tile-{{$index | letterize}}")
          .info
-            ul 
+            ul
                li
-                  span.temp= parseInt(Math.random() * 100 + 100)
-                  | °
+                  span.temp {{s.temp}}°
                   span.title current
                li
-                  span.temp= parseInt(Math.random() * 100 + 100)
-                  | °
-                  span.title average
+                  span.temp {{s.change}}°
+                  span.title change
                li.graph-container
                   .graph
             .attrs
-               span.name Meat
-               span.goal 180 Max
-            i(class="fa fa-cog")
-      .tile-container.third.tile-b
-         .info
-            ul 
-               li
-                  span.temp= parseInt(Math.random() * 100 + 100)
-                  | °
-                  span.title current
-               li
-                  span.temp= parseInt(Math.random() * 100 + 100)
-                  | °
-                  span.title average
-               li.graph-container
-                  .graph
-            .attrs
-               span.name Meat
-               span.goal 180 Max
-            i(class="fa fa-cog")
-      .tile-container.third.tile-c
-         .info
-            ul 
-               li
-                  span.temp= parseInt(Math.random() * 100 + 100)
-                  | °
-                  span.title current
-               li
-                  span.temp= parseInt(Math.random() * 100 + 100)
-                  | °
-                  span.title average
-               li.graph-container
-                  .graph
-            .attrs
-               span.name Meat
-               span.goal 180 Max
+               span.name {{s.name}}
+               span.goal {{s.goal}}° Max
+            i(class="fa fa-fire" ng-if="s.is_primary")
             i(class="fa fa-cog")
 

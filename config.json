@@ -1,0 +1,20 @@
+{
+  "poll_interval": 1000,
+  "power_pin": 11,
+  "target_temp": 245,
+  "sensors": [
+    {
+      "name": "main",
+      "primary": true,
+      "miso": 0,
+      "ss": 12,
+      "clk": 3
+    },
+    {
+      "name": "meat",
+      "miso": 0,
+      "ss": 2,
+      "clk": 3
+    }
+  ]
+}
