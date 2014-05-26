@@ -12,7 +12,7 @@ block content
                   span.temp {{s.change}}°
                   span.title change
                li.graph-container
-                  .graph
+                  .graph(temp-graph data="s.data")
             .attrs
                span.name {{s.name}}
                span.goal {{s.goal}}° Max

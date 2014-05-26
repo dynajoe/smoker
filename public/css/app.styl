@@ -6,9 +6,9 @@ html, body
   background-color #333
   padding 0
 
-ul 
+ul
   margin 0
-  padding 0 
+  padding 0
   list-style-type none
 
 .tiles
@@ -17,16 +17,16 @@ ul
   overflow hidden
   margin-top 6px
 
-.tile-container 
-  float left 
+.tile-container
+  float left
 
   &.full
     width 632px
     float none
     clear both
     padding 8px
-    
-    div 
+
+    div
       background-color #D5694E
 
   &.third
@@ -38,7 +38,7 @@ ul
 
   &.tile-b .info
     background-color #8f7bb3
-  
+
   &.tile-c .info
     background-color #65B9B6
 
@@ -60,19 +60,19 @@ ul
     text-align left
     padding 10px
     padding-top 0px
-    
+
     span
       margin-right 10px
 
-  ul 
+  ul
     overflow hidden
     padding 10px
-  
+
   li
     float left
     width 50%
     padding-bottom 10px
-    
+
   .title
     color #dedede
     display block
@@ -82,10 +82,22 @@ ul
     width 180px
     height 60px
 
-  .graph 
+  .graph
     width 100%
     height 100%
+    font 10px sans-serif
+
     path
       stroke white
       stroke-width 1
       fill none
+
+    .line
+      fill none
+      stroke #000
+      stroke-width 1.5px
+
+    .axis path, .axis line
+      fill none
+      stroke #000
+      shape-rendering crispEdges

@@ -8,7 +8,8 @@ var updateSensors = function ($scope, data) {
       var sensor = $scope.sensors[i];
       var new_temp = Number(data[sensor.name].value);
       var current_temp = sensor.temp;
-
+      sensor.data = sensor.data || [];
+      sensor.data.push(new_temp);
       if (current_temp) {
          sensor.change = new_temp - current_temp;
       }

@@ -13,7 +13,8 @@ app.configure(function () {
    app.use(express.static(__dirname + '/public/'));
    app.use(express.static(__dirname + '/bower_components/'));
    app.use(require('connect-assets')({
-      helperContext: app.locals
+      helperContext: app.locals,
+      paths: ['public/css']
    }));
 });
 
