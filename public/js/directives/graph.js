@@ -4,31 +4,40 @@ angular.module('appDirectives')
    var definition = {
       restrict: 'A',
       scope: {
-         data: '='
+         data: '=',
+         min: '=?',
+         max: '=?',
+         timespan: '=?'
       },
       link: function ($scope, element, attrs) {
          d3Service.d3().then(function (d3) {
+            var update_rate = 1500;
+            var now = Date.now();
+
             var width = parseInt(d3.select(element[0]).style('width'), 10);
             var height = parseInt(d3.select(element[0]).style('height'), 10);
-            var now = new Date();
-            var end = new Date(now.getTime() + 60*1000);
+
+            var timespan = $scope.timespan = $scope.timespan || (3 * 60 * 1000);
+            var min = $scope.min = $scope.min === undefined ? 150 : $scope.min;
+            var max = $scope.max = $scope.max === undefined ? 250 : $scope.max;
+
+            var margin = { left: 30, bottom: 20, top: 10, right: 5 };
 
             var x = d3.time.scale()
-            .domain([now, end])
-            .range([0, width]);
+            .domain([now - timespan, now])
+            .range([margin.left, width]);
 
             var y = d3.scale.linear()
-            .domain([0, 250])
-            .range([height, 0]);
+            .domain([min, max])
+            .range([height - margin.bottom, margin.top]);
 
             var line = d3.svg.line()
+            .interpolate('monotone')
             .x(function (d, i) {
-               console.log('x', d, i);
-               return x(i);
+               return x(d.time);
             })
             .y(function (d, i) {
-               console.log('y', d, i);
-               return y(d);
+               return y(d.value);
             });
 
             var svg = d3.select(element[0])
@@ -41,29 +50,51 @@ angular.module('appDirectives')
                .append('clipPath')
                .attr('id', 'clip')
                   .append('rect')
-                  .attr('width', width)
+                  .attr('x', margin.left)
+                  .attr('width', width - margin.left - margin.right)
                   .attr('height', height);
 
-            svg.append('g')
+            var axis = svg.append('g')
                .attr('class', 'x axis')
-               .attr('transform', 'translate(0,' + y(150) + ')')
-               .call(d3.svg.axis().scale(x).orient('bottom'));
+               .attr('clip-path', 'url(#clip)')
+               .attr('transform', 'translate(0,' + y(min) + ')')
+               .call(x.axis = d3.svg.axis().scale(x).orient('bottom').ticks(5));
 
             svg.append('g')
                .attr('class', 'y axis')
-               .call(d3.svg.axis().scale(y).orient('left'));
+               .attr('transform', 'translate(' + margin.left + ', 0)')
+               .call(d3.svg.axis().scale(y).orient('left').ticks(2));
 
-            // var path = svg.append('g')
-            //    .attr('clip-path', 'url(#clip)')
-            //       .append('path')
-            //       .attr('class', 'line')
-            //       .attr('d', line)
-            //       .datum($scope.data);
+            var path = svg.append('g')
+               .attr('clip-path', 'url(#clip)')
+               .append('path')
+                  .data([$scope.data || []])
+                  .attr('class', 'line');
 
-            $scope.$watch('data', function (oldVal, newVal) {
+            var stepsize = x(now) - x(now - update_rate);
 
+            tick();
 
-            }, true);
+            function tick () {
+               now = Date.now();
+
+               x.domain([now - timespan, now]);
+
+               axis.transition()
+                  .duration(update_rate)
+                  .ease('linear')
+                  .call(x.axis);
+
+               svg.select('.line')
+                  .attr('d', line)
+                  .attr('transform', null);
+
+               path.transition()
+                  .duration(update_rate)
+                  .ease('linear')
+                  .attr('transform', 'translate(-' + stepsize + ')')
+                  .each('end', tick);
+            }
          });
       }
    };

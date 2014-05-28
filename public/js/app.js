@@ -13,4 +13,18 @@ angular.module('smokerApp', [
   'appDirectives'
 ]);
 
+Array.prototype.last = function (num) {
+   if (num !== undefined) {
+      return this.slice(-num);
+   }
+   return this[this.length - 1];
+};
+
+Array.prototype.first = function (num) {
+   if (num !== undefined) {
+      return this.slice(0, num);
+   }
+   return this[0];
+};
+
 })();

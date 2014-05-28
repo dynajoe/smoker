@@ -1,7 +1,7 @@
 {
   "poll_interval": 1000,
   "power_pin": 11,
-  "target_temp": 245,
+  "target_temp": 230,
   "sensors": [
     {
       "name": "main",

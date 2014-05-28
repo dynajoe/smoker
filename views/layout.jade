@@ -2,8 +2,9 @@ doctype html
 html(lang="en", ng-app="smokerApp")
    head
       title Smoker Control
-      != css('app')
       link(rel='stylesheet' href='css/font-awesome.min.css' type='text/css')
+      link(rel='stylesheet' href='bootstrap/dist/css/bootstrap.css' type='text/css')
+      != css('app')
       script(src='/angular/angular.min.js' type='text/javascript')
       script(src='/socket.io/socket.io.js')
       script(src='/angular-socket-io/socket.min.js' type='text/javascript')

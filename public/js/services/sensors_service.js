@@ -20,6 +20,14 @@ appServices.factory(
             $io.emit('sensors', function (data) {
                cb(data);
             });
+
+         },
+         initialize: function (cb) {
+            this.history(function (history) {
+               this.sensors(function (sensors) {
+                  cb(sensors, history);
+               });
+            }.bind(this));
          }
       };
    }
@@ -45,7 +53,7 @@ angular.module('d3', [])
       var scriptTag = $document[0].createElement('script');
       scriptTag.type = 'text/javascript';
       scriptTag.async = true;
-      scriptTag.src = 'http://d3js.org/d3.v3.min.js';
+      scriptTag.src = '/d3/d3.js';
       scriptTag.onreadystatechange = function () {
         if (this.readyState == 'complete') onScriptLoad();
       };

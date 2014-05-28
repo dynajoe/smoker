@@ -7,15 +7,21 @@ block content
             ul
                li
                   span.temp {{s.temp}}°
-                  span.title current
+                  i(class="fa fa-fire" ng-if="s.is_primary && s.state == 'on'")
+                  span.title(ng-if='s.is_primary') {{s.goal}}° target
                li
-                  span.temp {{s.change}}°
-                  span.title change
+                  span.temp {{s.roc}}°/s
+                  span.title rate
                li.graph-container
                   .graph(temp-graph data="s.data")
             .attrs
                span.name {{s.name}}
-               span.goal {{s.goal}}° Max
-            i(class="fa fa-fire" ng-if="s.is_primary")
-            i(class="fa fa-cog")
 
+            a(href="#" ng-click="s.show_config=!s.show_config" ng-if="s.is_primary")
+               i(class="fa fa-cog")
+         .config(ng-show="s.show_config")
+            form.form(role='form')
+               .form-group
+                  input.form-control(placeholder='Target temperature')
+               .form-group
+                  button.btn.btn-default(type='submit') Update
