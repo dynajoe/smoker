@@ -2,7 +2,7 @@
   "name": "smoker-control",
   "version": "0.0.1",
   "dependencies": {
-    "express": "*",
+    "express": "3.0.4",
     "jade": "*",
     "socket.io": "*",
     "nib": "~1.0.2",
