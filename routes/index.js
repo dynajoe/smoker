@@ -8,6 +8,11 @@ var Initialize = function (app) {
          cb(smoker.sensors);
       });
 
+      socket.on('target_temp', function (value) {
+         console.log('request to change target temp: ', value);
+         smoker.setTargetTemp(value);
+      });
+
       socket.on('history', function (cb) {
          cb(smoker.data);
       });

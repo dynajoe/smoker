@@ -28,6 +28,9 @@ appServices.factory(
                   cb(sensors, history);
                });
             }.bind(this));
+         },
+         setTargetTemp: function (value) {
+            $io.emit('target_temp', value);
          }
       };
    }

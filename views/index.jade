@@ -22,6 +22,6 @@ block content
          .config(ng-show="s.show_config")
             form.form(role='form')
                .form-group
-                  input.form-control(placeholder='Target temperature')
+                  input.form-control(placeholder='Target temperature' ng-model='target_temp')
                .form-group
-                  button.btn.btn-default(type='submit') Update
+                  button.btn.btn-default(type='submit' ng-click='update_config(target_temp)') Update

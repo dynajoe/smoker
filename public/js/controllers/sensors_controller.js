@@ -34,6 +34,10 @@ var updateSensors = function ($scope, smoker) {
 appControllers.controller(
    'SensorsController', ['$scope', 'SmokerService',
    function ($scope, SmokerService) {
+      $scope.update_config = function (target) {
+         SmokerService.setTargetTemp(target);
+      };
+
       SmokerService.initialize(function (sensors, history) {
          $scope.sensors = sensors;
 
