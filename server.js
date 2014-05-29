@@ -20,17 +20,8 @@ app.configure(function () {
 
 var smoker = new Smoker(config);
 
-smoker.initialize(function (err) {
-   if (err) {
-      console.log(err);
-      return;
-   }
-
-   if (!smoker.start()) {
-      console.log('Unable to start smoker');
-      return;
-   }
-
+smoker.start()
+.then(function () {
    app.set('smoker', smoker);
    app.set('config', config);
    require('./routes/index')(app);
