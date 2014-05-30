@@ -22,8 +22,8 @@ var updateSensors = function ($scope, smoker) {
       var roc = Math.round(temp_diff / time_diff);
 
       if (sensor.is_primary) {
-         sensor.state = smoker.state;
-         sensor.goal = smoker.target_temp;
+         sensor.state = smoker.info.state;
+         sensor.goal = smoker.info.target_temp;
       }
 
       sensor.roc = roc > 0 ? ("+" + roc) : roc;
