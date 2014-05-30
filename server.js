@@ -4,6 +4,7 @@ var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
 var config = require('./config');
 var Smoker = require('./lib/smoker');
+var Log = require('./lib/log');
 
 app.configure(function () {
    app.set('port', process.env.PORT || 3000);
@@ -29,4 +30,5 @@ smoker.start()
 
    console.log('NODE_ENV: ' + process.env.NODE_ENV);
    console.log('Server listening on port ' + app.get('port'));
-});
+})
+.fail(Log);
