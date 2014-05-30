@@ -1,6 +1,6 @@
 {
   "poll_interval": 1000,
-  "power_pin": 11,
+  "power_pin": 18,
   "primary_sensor": {
     "name": "main",
     "miso": 0,
