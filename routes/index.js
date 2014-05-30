@@ -5,11 +5,10 @@ var Initialize = function (app) {
 
    io.sockets.on('connection', function (socket) {
       socket.on('sensors', function (cb) {
-         cb(smoker.sensors);
+         cb(smoker.getSensors());
       });
 
       socket.on('target_temp', function (value) {
-         console.log('request to change target temp: ', value);
          smoker.setTargetTemp(value);
       });
 
@@ -20,9 +19,6 @@ var Initialize = function (app) {
 
    smoker.on('data', function (data) {
       io.sockets.emit('update', {
-         state: smoker.state,
-         current_temp: smoker.temperature(),
-         target_temp: smoker.target_temp,
          data: data
       });
    });

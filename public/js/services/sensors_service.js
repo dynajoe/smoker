@@ -42,6 +42,11 @@ appServices.factory(
    }
 ]);
 
+angular.module('underscore', [])
+   .factory('_', function() {
+      return window._;
+   });
+
 angular.module('d3', [])
   .factory('d3Service', ['$document', '$q', '$rootScope',
     function($document, $q, $rootScope) {
