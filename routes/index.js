@@ -4,6 +4,10 @@ var Initialize = function (app) {
    var config = app.get('config');
 
    io.sockets.on('connection', function (socket) {
+      socket.on('time', function (cb) {
+         cb(Date.now());
+      });
+
       socket.on('sensors', function (cb) {
          cb(smoker.getSensors());
       });
@@ -19,6 +23,7 @@ var Initialize = function (app) {
 
    smoker.on('data', function (data) {
       io.sockets.emit('update', {
+         info: smoker.brains.info(),
          data: data
       });
    });
