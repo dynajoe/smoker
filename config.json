@@ -1,17 +1,12 @@
 {
   "poll_interval": 1000,
   "power_pin": 18,
+  "target_temp": 240,
   "primary_sensor": {
     "name": "main",
     "miso": 0,
     "ss": 12,
-    "clk": 3,
-    "pid_config": {
-      "set_point": 240,
-      "p": 0.5,
-      "i": 0.01,
-      "d": 0.01
-    }
+    "clk": 3
   },
   "sensors": [{
     "name": "meat",
