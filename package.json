@@ -9,7 +9,7 @@
     "stylus": "~0.42.0",
     "max6675-raspberry-pi": "*",
     "underscore": "^1.5.2",
-    "rpi-gpio": "^0.3.2",
+    "gpio": "0.2.5",
     "connect-assets": "3.0.1",
     "q": "^1.0.1"
   }
