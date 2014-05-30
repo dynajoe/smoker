@@ -4,7 +4,9 @@ var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
 var config = require('./config');
 var Smoker = require('./lib/smoker');
-var Log = require('./lib/log');
+var logger = require('winston');
+
+logger.info('NODE_ENV: ' + process.env.NODE_ENV);
 
 app.configure(function () {
    app.set('port', process.env.PORT || 3000);
@@ -27,8 +29,6 @@ smoker.start()
    app.set('config', config);
    require('./routes/index')(app);
    server.listen(app.get('port'));
-
-   console.log('NODE_ENV: ' + process.env.NODE_ENV);
-   console.log('Server listening on port ' + app.get('port'));
+   logger.info('Server listening on port ' + app.get('port'));
 })
-.fail(Log);
+.fail(logger.error);
