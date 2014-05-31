@@ -32,8 +32,8 @@ var updateSensors = function ($scope, smoker) {
 };
 
 appControllers.controller(
-   'SensorsController', ['$scope', 'SmokerService',
-   function ($scope, SmokerService) {
+   'SensorsController', ['$scope', 'SmokerService', 'amMoment',
+   function ($scope, SmokerService, amMoment) {
       $scope.update_config = function () {
          SmokerService.setTargetTemp($scope.target_temp);
          $scope.target_temp = null;
@@ -43,8 +43,10 @@ appControllers.controller(
          $scope.sensors = sensors;
 
          $scope.sensors.forEach(function (s) {
-            s.data = getHistory(s.name, history, 3 * 60 * 1000);
+            s.data = getHistory(s.name, history.data, 3 * 60 * 1000);
          });
+
+         $scope.started_on = history.started_on;
 
          $scope.$on('smoker:update', function (event, smoker) {
             updateSensors($scope, smoker);
@@ -53,12 +55,12 @@ appControllers.controller(
    }
 ]);
 
-var getHistory = function (name, history, timespan) {
+var getHistory = function (name, data, timespan) {
    var result = [];
    var oldest_time = new Date().getTime() - timespan;
 
-   for (var i = history.length - 1; i >= 0; i--) {
-      var entry = history[i][name];
+   for (var i = data.length - 1; i >= 0; i--) {
+      var entry = data[i][name];
 
       if (entry) {
          if (entry.time >= oldest_time) {

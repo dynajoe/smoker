@@ -25,3 +25,7 @@ block content
                   input.form-control(ng-pattern='/^\\d+$/' ng-required='true' name='target_temp' min='0' max='400' type='number' placeholder='Target temperature' ng-model='$parent.target_temp')
                .form-group
                   button.btn.btn-default(required ng-disabled='!config.target_temp.$valid' type='submit' ng-click='update_config()') Update
+      .tile-container.full
+         .info
+            span.started running for&nbsp;
+               span.time(am-time-ago="started_on")

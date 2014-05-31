@@ -17,7 +17,10 @@ var Initialize = function (app) {
       });
 
       socket.on('history', function (cb) {
-         cb(smoker.data);
+         cb({
+            data: smoker.data,
+            started_on: smoker.started_on
+         });
       });
    });
 

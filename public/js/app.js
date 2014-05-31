@@ -7,12 +7,16 @@ angular.module('appDirectives', []);
 angular.module('smokerApp', [
   'btford.socket-io',
   'd3',
+  'angularMoment',
   'underscore',
   'appServices',
   'appControllers',
   'appFilters',
   'appDirectives'
-]);
+])
+.constant('amTimeAgoConfig', {
+   withoutSuffix: true
+});
 
 Array.prototype.last = function (num) {
    if (num !== undefined) {
