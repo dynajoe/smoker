@@ -38,6 +38,7 @@ db.open(function (err) {
       server.listen(app.get('port'));
       logger.info('Server listening on port ' + app.get('port'));
    })
-   .fail(logger.error);
-
+   .fail(function (e) {
+      logger.error('Unable to start smoker', e);
+   });
 });
