@@ -97,6 +97,14 @@ angular.module('appDirectives')
                   return d.value;
                });
 
+               max_value = (Math.round(Math.ceil(max_value / 10) * 100)) / 10;
+
+               var range = max_value - min_value;
+
+               if (range > 30) {
+                  min_value = max_value - 30;
+               }
+
                y.domain([min_value, max_value]);
 
                y_axis.transition()
