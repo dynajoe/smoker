@@ -60,10 +60,10 @@ angular.module('appDirectives')
                .attr('transform', 'translate(0,' + y(min) + ')')
                .call(x.axis = d3.svg.axis().scale(x).orient('bottom').ticks(5));
 
-            svg.append('g')
+            var y_axis = svg.append('g')
                .attr('class', 'y axis')
                .attr('transform', 'translate(' + margin.left + ', 0)')
-               .call(d3.svg.axis().scale(y).orient('left').ticks(2));
+               .call(y.axis = d3.svg.axis().scale(y).orient('left').ticks(2));
 
             var path = svg.append('g')
                .attr('clip-path', 'url(#clip)')
@@ -88,6 +88,21 @@ angular.module('appDirectives')
                svg.select('.line')
                   .attr('d', line)
                   .attr('transform', null);
+
+               var min_value = d3.min($scope.data, function (d) {
+                  return d.value;
+               });
+
+               var max_value = d3.max($scope.data, function (d) {
+                  return d.value;
+               });
+
+               y.domain([min_value, max_value]);
+
+               y_axis.transition()
+                  .duration(update_rate)
+                  .ease('linear')
+                  .call(y.axis);
 
                path.transition()
                   .duration(update_rate)
