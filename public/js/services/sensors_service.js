@@ -16,6 +16,10 @@ appServices.factory(
                cb(data);
             });
          },
+         reset: function (cb) {
+            $io.emit('reset');
+            cb(Date.now());
+         },
          sensors: function (cb) {
             $io.emit('sensors', function (data) {
                cb(data);

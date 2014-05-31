@@ -39,6 +39,15 @@ appControllers.controller(
          $scope.target_temp = null;
       };
 
+      $scope.reset = function () {
+         SmokerService.reset(function (started_on) {
+            $scope.started_on = started_on;
+            $scope.sensors.forEach(function (s) {
+               s.data.length = 0;
+            });
+         });
+      };
+
       SmokerService.initialize(function (sensors, history) {
          $scope.sensors = sensors;
 

@@ -8,6 +8,10 @@ var Initialize = function (app) {
          cb(Date.now());
       });
 
+      socket.on('reset', function () {
+         smoker.reset();
+      });
+
       socket.on('sensors', function (cb) {
          cb(smoker.getSensors());
       });
