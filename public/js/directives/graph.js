@@ -101,7 +101,7 @@ angular.module('appDirectives')
 
                var range = max_value - min_value;
 
-               if (range > 30) {
+               if (range < 30) {
                   min_value = max_value - 30;
                }
 
