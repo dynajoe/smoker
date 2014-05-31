@@ -5,6 +5,7 @@ var io = require('socket.io').listen(server);
 var config = require('./config');
 var Smoker = require('./lib/smoker');
 var logger = require('winston');
+var mongodb = require('mongodb');
 
 logger.info('NODE_ENV: ' + process.env.NODE_ENV);
 
@@ -21,14 +22,22 @@ app.configure(function () {
    }));
 });
 
-var smoker = new Smoker(config);
+var server = mongodb.Server('localhost', '27017');
+var db = mongodb.Db('smoker', server, { safe: true });
 
-smoker.start()
-.then(function () {
-   app.set('smoker', smoker);
-   app.set('config', config);
-   require('./routes/index')(app);
-   server.listen(app.get('port'));
-   logger.info('Server listening on port ' + app.get('port'));
-})
-.fail(logger.error);
+db.open(function (err) {
+   if (err) throw err;
+
+   var smoker = new Smoker(config, db);
+
+   smoker.start()
+   .then(function () {
+      app.set('smoker', smoker);
+      app.set('config', config);
+      require('./routes/index')(app);
+      server.listen(app.get('port'));
+      logger.info('Server listening on port ' + app.get('port'));
+   })
+   .fail(logger.error);
+
+});
