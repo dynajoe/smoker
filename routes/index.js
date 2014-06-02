@@ -1,3 +1,5 @@
+var SystemCommander = require('../lib/system_commander');
+
 var Initialize = function (app) {
    var io = app.get('io');
    var smoker = app.get('smoker');
@@ -6,6 +8,14 @@ var Initialize = function (app) {
    io.sockets.on('connection', function (socket) {
       socket.on('time', function (cb) {
          cb(Date.now());
+      });
+
+      socket.on('shutdown', function () {
+         logger.info('Shutting down');
+         smoker.stop()
+         .fin(function () {
+            SystemCommander.shutdown();
+         });
       });
 
       socket.on('reset', function () {
