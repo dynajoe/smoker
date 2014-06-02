@@ -58,6 +58,7 @@ appControllers.controller(
          $scope.started_on = history.started_on;
 
          $scope.$on('smoker:update', function (event, smoker) {
+            $scope.pid = smoker.info.pid_state.result;
             updateSensors($scope, smoker);
          });
       });
