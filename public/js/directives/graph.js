@@ -19,7 +19,7 @@ angular.module('appDirectives')
             var height = parseInt(d3.select(element[0]).style('height'), 10);
             var margin = { left: 30, bottom: 20, top: 10, right: 5 };
 
-            var timespan = $scope.timespan = $scope.timespan || (.5 * 60 * 1000);
+            var timespan = $scope.timespan = $scope.timespan || (3 * 60 * 1000);
             var min = $scope.min = $scope.min === undefined ? 150 : $scope.min;
             var max = $scope.max = $scope.max === undefined ? 250 : $scope.max;
 
@@ -28,7 +28,7 @@ angular.module('appDirectives')
             .range([margin.left, width]);
 
             var y = d3.scale.linear()
-            .domain([min, max])
+            .domain(getExtent($scope.data))
             .range([height - margin.bottom, margin.top]);
 
             var line = d3.svg.line()
@@ -45,6 +45,10 @@ angular.module('appDirectives')
                .attr('width', width)
                .attr('height', height)
                .append('g');
+
+            var status_indicators = svg.append('g')
+               .attr('clip-path', 'url(#clip)')
+               .attr('z-index', 0);
 
             svg.append('defs')
                .append('clipPath')
@@ -71,15 +75,12 @@ angular.module('appDirectives')
                   .data([$scope.data || []])
                   .attr('class', 'line');
 
-            var stepsize = x(now) - x(now - update_rate);
-            // Draw on boxes
-
-            var status_indicators = svg.append('g');
-
             tick();
 
             function tick () {
-               now = Date.now();
+               var now = Date.now();
+
+               var step_size = (x(now) - x(now - update_rate));
 
                x.domain([now - timespan, now]);
 
@@ -90,25 +91,10 @@ angular.module('appDirectives')
 
                svg.select('.line')
                   .attr('d', line)
+                  .attr('z-index', 1)
                   .attr('transform', null);
 
-               var min_value = d3.min($scope.data, function (d) {
-                  return d.value;
-               });
-
-               var max_value = d3.max($scope.data, function (d) {
-                  return d.value;
-               });
-
-               max_value = (Math.round(Math.ceil(max_value / 10) * 100)) / 10;
-
-               var range = max_value - min_value;
-
-               if (range < 30) {
-                  min_value = max_value - 30;
-               }
-
-               y.domain([min_value, max_value]);
+               y.domain(getExtent($scope.data));
 
                y_axis.transition()
                   .duration(update_rate)
@@ -118,12 +104,16 @@ angular.module('appDirectives')
                path.transition()
                   .duration(update_rate)
                   .ease('linear')
-                  .attr('transform', 'translate(-' + stepsize + ')')
+                  .attr('transform', 'translate(-' + step_size + ')')
                   .each('end', tick);
 
             var status_rects = status_indicators
                .selectAll('.state')
-               .data($scope.powerData);
+               .data($scope.powerData, function (d, i) {
+                  var key = d.start + "" + d.end;
+                  console.log(key);
+                  return key;
+               });
 
             status_rects
                .exit()
@@ -131,31 +121,32 @@ angular.module('appDirectives')
 
             status_rects
                .enter()
-               .append('rect')
-                  .attr('clip-path', 'url(#clip)')
-                  .style('fill', function (d) {
-                     return d.state === 'on' ? 'red' : 'white';
-                  })
-                  .attr('class', 'state')
-                  .attr('y', 0)
-                  .attr('x', function (d) {
-                     return x(d.start);
-                  })
-                  .attr('width', function (d) {
-                     var end = x(d.end || Date.now());
-                     var start = x(d.start);
-                     var width = Math.abs(end - start);
-                     return width;
-                  })
-                  .attr('height', 5);
+               .append('rect');
 
-               status_rects
-                  .transition()
-                  .duration(update_rate)
-                  .ease('linear')
-                  .attr('x', function (d) {
-                     return x(d.start) - stepsize;
-                  });
+            status_rects
+               .attr('class', function (d) {
+                  return d.state + ' state';
+               })
+               .attr('y', 0)
+               .attr('x', function (d) {
+                  return x(d.start);
+               })
+               .attr('width', function (d) {
+                  var end_time = d.end || Date.now();
+                  var end = x(end_time);
+                  var start = x(d.start);
+                  var width = Math.abs(end - start);
+                  return width;
+               })
+               .attr('height', y(0));
+
+            status_rects
+               .transition()
+               .duration(update_rate)
+               .ease('linear')
+               .attr('x', function (d) {
+                  return x(d.start) - step_size;
+               });
             }
          });
       }
@@ -163,3 +154,23 @@ angular.module('appDirectives')
 
    return definition;
 }]);
+
+var getExtent = function (data) {
+   var min_value = d3.min(data, function (d) {
+      return d.value;
+   });
+
+   var max_value = d3.max(data, function (d) {
+      return d.value;
+   });
+
+   max_value = (Math.round(Math.ceil(max_value / 10) * 100)) / 10;
+
+   var range = max_value - min_value;
+
+   if (range < 30) {
+      min_value = max_value - 30;
+   }
+
+   return [min_value, max_value];
+};

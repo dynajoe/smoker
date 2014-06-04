@@ -63,10 +63,8 @@ appControllers.controller(
          $scope.$on('smoker:update', function (event, smoker) {
             $scope.pid = smoker.info.pid_state.result;
 
-            var last_item = $scope.power_data.last();
-
-            if (last_item.state !== smoker.info.state) {
-               last_item.end = smoker.data.time;
+            if ($scope.power_data.last().state !== smoker.info.state) {
+               $scope.power_data.last().end = smoker.data.time;
                $scope.power_data.push({
                   state: smoker.info.state,
                   start: smoker.data.time
@@ -88,6 +86,7 @@ var getPowerData = function (data) {
 
       if (current && current.state !== d.state) {
          result.push({
+            id: result.length + '_' + 0,
             state: current.state,
             start: current.start,
             end: d.time
