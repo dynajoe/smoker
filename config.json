@@ -3,10 +3,11 @@
   "power_pin": 18,
   "target_temp": 240,
   "data_buffer_size": 30,
+  "duty_cycle": 8000,
   "pid": {
     "p": 0.5,
     "i": 0.1,
-    "d": 0.1,
+    "d": 0,
     "range": 15
   },
   "primary_sensor": {

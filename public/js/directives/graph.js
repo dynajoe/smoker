@@ -5,6 +5,7 @@ angular.module('appDirectives')
       restrict: 'A',
       scope: {
          data: '=',
+         powerData: '=',
          min: '=?',
          max: '=?',
          timespan: '=?'
@@ -16,12 +17,11 @@ angular.module('appDirectives')
 
             var width = parseInt(d3.select(element[0]).style('width'), 10);
             var height = parseInt(d3.select(element[0]).style('height'), 10);
+            var margin = { left: 30, bottom: 20, top: 10, right: 5 };
 
-            var timespan = $scope.timespan = $scope.timespan || (3 * 60 * 1000);
+            var timespan = $scope.timespan = $scope.timespan || (.5 * 60 * 1000);
             var min = $scope.min = $scope.min === undefined ? 150 : $scope.min;
             var max = $scope.max = $scope.max === undefined ? 250 : $scope.max;
-
-            var margin = { left: 30, bottom: 20, top: 10, right: 5 };
 
             var x = d3.time.scale()
             .domain([now - timespan, now])
@@ -72,6 +72,9 @@ angular.module('appDirectives')
                   .attr('class', 'line');
 
             var stepsize = x(now) - x(now - update_rate);
+            // Draw on boxes
+
+            var status_indicators = svg.append('g');
 
             tick();
 
@@ -117,6 +120,42 @@ angular.module('appDirectives')
                   .ease('linear')
                   .attr('transform', 'translate(-' + stepsize + ')')
                   .each('end', tick);
+
+            var status_rects = status_indicators
+               .selectAll('.state')
+               .data($scope.powerData);
+
+            status_rects
+               .exit()
+               .remove();
+
+            status_rects
+               .enter()
+               .append('rect')
+                  .attr('clip-path', 'url(#clip)')
+                  .style('fill', function (d) {
+                     return d.state === 'on' ? 'red' : 'white';
+                  })
+                  .attr('class', 'state')
+                  .attr('y', 0)
+                  .attr('x', function (d) {
+                     return x(d.start);
+                  })
+                  .attr('width', function (d) {
+                     var end = x(d.end || Date.now());
+                     var start = x(d.start);
+                     var width = Math.abs(end - start);
+                     return width;
+                  })
+                  .attr('height', 5);
+
+               status_rects
+                  .transition()
+                  .duration(update_rate)
+                  .ease('linear')
+                  .attr('x', function (d) {
+                     return x(d.start) - stepsize;
+                  });
             }
          });
       }

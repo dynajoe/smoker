@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var http_server = require('http').createServer(app);
-var io = require('socket.io').listen(http_server);
+var io = require('socket.io').listen(http_server, { log: true });
 var config = require('./config');
 var Smoker = require('./lib/smoker');
 var logger = require('winston');
