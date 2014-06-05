@@ -17,18 +17,18 @@ angular.module('appDirectives')
 
             var width = parseInt(d3.select(element[0]).style('width'), 10);
             var height = parseInt(d3.select(element[0]).style('height'), 10);
-            var margin = { left: 30, bottom: 20, top: 10, right: 5 };
+            var margin = { left: 30, bottom: 20, top: 5, right: 10 };
 
             var timespan = $scope.timespan = $scope.timespan || (3 * 60 * 1000);
-            var min = $scope.min = $scope.min === undefined ? 150 : $scope.min;
-            var max = $scope.max = $scope.max === undefined ? 250 : $scope.max;
 
             var x = d3.time.scale()
             .domain([now - timespan, now])
             .range([margin.left, width]);
 
+            var y_extent = getExtent($scope.data);
+
             var y = d3.scale.linear()
-            .domain(getExtent($scope.data))
+            .domain(y_extent)
             .range([height - margin.bottom, margin.top]);
 
             var line = d3.svg.line()
@@ -47,27 +47,26 @@ angular.module('appDirectives')
                .append('g');
 
             var status_indicators = svg.append('g')
-               .attr('clip-path', 'url(#clip)')
-               .attr('z-index', 0);
+               .attr('clip-path', 'url(#clip)');
 
             svg.append('defs')
                .append('clipPath')
                .attr('id', 'clip')
                   .append('rect')
                   .attr('x', margin.left)
+                  .attr('y', margin.top)
                   .attr('width', width - margin.left - margin.right)
-                  .attr('height', height);
+                  .attr('height', height - margin.top - margin.bottom);
 
             var axis = svg.append('g')
                .attr('class', 'x axis')
-               .attr('clip-path', 'url(#clip)')
-               .attr('transform', 'translate(0,' + y(min) + ')')
-               .call(x.axis = d3.svg.axis().scale(x).orient('bottom').ticks(5));
+               .attr('transform', 'translate(0,' + (height - margin.bottom) + ')')
+               .call(x.axis = d3.svg.axis().scale(x).orient('bottom').ticks(10));
 
             var y_axis = svg.append('g')
                .attr('class', 'y axis')
                .attr('transform', 'translate(' + margin.left + ', 0)')
-               .call(y.axis = d3.svg.axis().scale(y).orient('left').ticks(2));
+               .call(y.axis = d3.svg.axis().scale(y).orient('left').ticks(3));
 
             var path = svg.append('g')
                .attr('clip-path', 'url(#clip)')
@@ -91,7 +90,6 @@ angular.module('appDirectives')
 
                svg.select('.line')
                   .attr('d', line)
-                  .attr('z-index', 1)
                   .attr('transform', null);
 
                y.domain(getExtent($scope.data));
@@ -107,12 +105,14 @@ angular.module('appDirectives')
                   .attr('transform', 'translate(-' + step_size + ')')
                   .each('end', tick);
 
+            var earliestTime = Date.now() - timespan;
+
             var status_rects = status_indicators
                .selectAll('.state')
-               .data($scope.powerData, function (d, i) {
-                  var key = d.start + "" + d.end;
-                  console.log(key);
-                  return key;
+               .data(_.filter($scope.powerData, function (d) {
+                  return d.start >= earliestTime || !d.end || d.end >= earliestTime;
+               }), function (d, i) {
+                  return d.start + "" + d.end;
                });
 
             status_rects
@@ -121,13 +121,15 @@ angular.module('appDirectives')
 
             status_rects
                .enter()
-               .append('rect');
+               .append('rect')
+                  .attr('y', margin.top)
+                  .attr('class', function (d) {
+                     return d.state + ' state';
+                  })
+                  .attr('height', height - margin.top - margin.bottom);
 
+            // update
             status_rects
-               .attr('class', function (d) {
-                  return d.state + ' state';
-               })
-               .attr('y', 0)
                .attr('x', function (d) {
                   return x(d.start);
                })
@@ -138,15 +140,12 @@ angular.module('appDirectives')
                   var width = Math.abs(end - start);
                   return width;
                })
-               .attr('height', y(0));
-
-            status_rects
                .transition()
-               .duration(update_rate)
-               .ease('linear')
-               .attr('x', function (d) {
-                  return x(d.start) - step_size;
-               });
+                  .duration(update_rate)
+                  .ease('linear')
+                  .attr('x', function (d) {
+                     return x(d.start) - step_size;
+                  });
             }
          });
       }

@@ -3,7 +3,11 @@
 
 var appControllers = angular.module('appControllers');
 
-var updateSensors = function ($scope, sensors) {
+var updateSensors = function ($scope, smoker) {
+   var sensors = smoker.data.sensors;
+   var target_temp = smoker.info.target_temp;
+   var state = smoker.info.state;
+
    for (var i = 0; i < $scope.sensors.length; i++) {
       var sensor = $scope.sensors[i];
       var latest_data = sensors[sensor.name];
@@ -18,10 +22,10 @@ var updateSensors = function ($scope, sensors) {
       var time_diff = Math.abs(recent.first().time - recent.last().time) / 1000;
       var roc = Math.round(temp_diff / time_diff);
 
-      // if (sensor.is_primary) {
-      //    sensor.state = smoker.info.state;
-      //    sensor.goal = smoker.info.target_temp;
-      // }
+      if (sensor.is_primary) {
+         sensor.state = state;
+         sensor.goal = target_temp;
+      }
 
       sensor.roc = roc > 0 ? ("+" + roc) : roc;
       sensor.temp = Number(latest_data.value);
@@ -71,7 +75,7 @@ appControllers.controller(
                });
             }
 
-            updateSensors($scope, smoker.data.sensors);
+            updateSensors($scope, smoker);
          });
       });
    }
