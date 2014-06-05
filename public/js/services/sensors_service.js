@@ -26,6 +26,9 @@ appServices.factory(
             });
 
          },
+         shutdown: function () {
+            $io.emit('shutdown');
+         },
          initialize: function (cb) {
             this.history(function (history) {
                this.sensors(function (sensors) {

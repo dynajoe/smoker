@@ -51,6 +51,10 @@ appControllers.controller(
          });
       };
 
+      $scope.shutdown = function () {
+         SmokerService.shutdown();
+      };
+
       $scope.power_data = [];
 
       SmokerService.initialize(function (sensors, history) {
