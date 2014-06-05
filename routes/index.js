@@ -1,4 +1,5 @@
 var SystemCommander = require('../lib/system_commander');
+var logger = require('winston');
 
 var Initialize = function (app) {
    var io = app.get('io');
