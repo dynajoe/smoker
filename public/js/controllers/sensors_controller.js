@@ -113,7 +113,9 @@ var getPowerData = function (data) {
       }
    });
 
-   result.push(current);
+   if (current) {
+      result.push(current);
+   }
 
    return result;
 };
