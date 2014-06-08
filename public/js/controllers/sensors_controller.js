@@ -38,9 +38,16 @@ appControllers.controller(
       var time_window = 4 * 60 * 1000;
 
       $scope.update_config = function () {
-         SmokerService.setTargetTemp($scope.target_temp);
-         SmokerService.setDutyCycle($scope.duty_cycle);
+         if ($scope.target_temp) {
+            SmokerService.setTargetTemp($scope.target_temp);
+         }
+
+         if ($scope.duty_cycle) {
+            SmokerService.setDutyCycle($scope.duty_cycle);
+         }
+
          $scope.target_temp = null;
+         $scope.duty_cycle = null;
       };
 
       $scope.reset = function () {
