@@ -23,6 +23,10 @@ var Initialize = function (app) {
          smoker.reset();
       });
 
+      socket.on('duty_cycle', function (value) {
+         smoker.setDutyCycle(value);
+      });
+
       socket.on('sensors', function (cb) {
          cb(smoker.getSensors());
       });

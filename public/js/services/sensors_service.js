@@ -38,6 +38,9 @@ appServices.factory(
          },
          setTargetTemp: function (value) {
             $io.emit('target_temp', value);
+         },
+         setDutyCycle: function (value) {
+            $io.emit('duty_cycle', value);
          }
       };
    }

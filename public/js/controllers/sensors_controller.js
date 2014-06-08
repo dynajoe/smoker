@@ -39,6 +39,7 @@ appControllers.controller(
 
       $scope.update_config = function () {
          SmokerService.setTargetTemp($scope.target_temp);
+         SmokerService.setDutyCycle($scope.duty_cycle);
          $scope.target_temp = null;
       };
 
