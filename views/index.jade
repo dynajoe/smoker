@@ -29,11 +29,11 @@ block content
             .config(ng-show="s.show_config")
                form.form(name='config' role='form')
                   .form-group
-                     input.form-control(ng-pattern='/^\\d+$/' ng-required='true' name='target_temp' min='0' max='400' type='number' placeholder='Target temperature' ng-model='$parent.target_temp')
+                     input.form-control(ng-pattern='/^\\d+$/' name='target_temp' min='0' max='400' type='number' placeholder='Target temperature' ng-model='$parent.target_temp')
                   .form-group
-                     input.form-control(ng-pattern='/^\\d+$/' ng-required='true' name='duty_cycle' type='number' placeholder='Duty cycle' ng-model='$parent.duty_cycle')
+                     input.form-control(ng-pattern='/^\\d+$/' name='duty_cycle' type='number' placeholder='Duty cycle' ng-model='$parent.duty_cycle')
                   .form-group
-                     button.btn.btn-default(required ng-disabled='!config.target_temp.$valid' type='submit' ng-click='update_config()') Update
+                     button.btn.btn-default(required type='submit' ng-click='update_config()') Update
    .row
       .col-xs-12
          a.reset(href="#" ng-click='reset()') reset
