@@ -12,7 +12,6 @@
     "gpio": "0.2.5",
     "connect-assets": "3.0.1",
     "q": "^1.0.1",
-    "winston": "^0.7.3",
-    "mongodb": "^1.4.5"
+    "winston": "^0.7.3"
   }
 }
