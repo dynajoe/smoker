@@ -1,1 +1,1 @@
-sudo NODE_ENV=production node server.js
+sudo NODE_ENV=production node index.js

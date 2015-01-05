@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var http_server = require('http').createServer(app);
 var io = require('socket.io').listen(http_server, { log: true });
-var config = require('./config');
+var config = require('./lib/config');
 var Smoker = require('./lib/smoker');
 var logger = require('winston');
 
@@ -25,14 +25,14 @@ var smoker = new Smoker(config);
 
 smoker.start()
 .then(function () {
-   logger.info('start complete');
+   logger.info('Smoker started.');
    app.set('smoker', smoker);
    app.set('config', config);
    require('./routes/index')(app);
-   logger.info('Starting http server on port %d', app.get('port'));
+   logger.info('Starting http server on port %d.', app.get('port'));
    http_server.listen(app.get('port'));
-   logger.info('Server listening on port %d', app.get('port'));
+   logger.info('Server listening on port %d.', app.get('port'));
 })
 .fail(function (e) {
-   logger.error('Unable to start smoker', e);
+   logger.error('Unable to start smoker.', e);
 });

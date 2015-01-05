@@ -2,16 +2,17 @@
   "name": "smoker-control",
   "version": "0.0.1",
   "dependencies": {
-    "express": "3.0.4",
-    "jade": "*",
-    "socket.io": "*",
-    "nib": "~1.0.2",
-    "stylus": "~0.42.0",
-    "max6675-raspberry-pi": "*",
-    "underscore": "^1.5.2",
-    "gpio": "0.2.5",
     "connect-assets": "3.0.1",
+    "express": "3.0.4",
+    "gpio": "0.2.5",
+    "jade": "*",
+    "max6675-raspberry-pi": "*",
+    "nib": "~1.0.2",
     "q": "^1.0.1",
+    "serialport": "^1.4.10",
+    "socket.io": "*",
+    "stylus": "~0.42.0",
+    "underscore": "^1.5.2",
     "winston": "^0.7.3"
   }
 }
