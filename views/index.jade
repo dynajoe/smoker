@@ -31,12 +31,10 @@ block content
                   .form-group
                      input.form-control(ng-pattern='/^\\d+$/' name='target_temp' min='0' max='400' type='number' placeholder='Target temperature' ng-model='$parent.target_temp')
                   .form-group
-                     input.form-control(ng-pattern='/^\\d+$/' name='duty_cycle' type='number' placeholder='Duty cycle' ng-model='$parent.duty_cycle')
-                  .form-group
                      button.btn.btn-default(required type='submit' ng-click='update_config()') Update
-   .row
+   .row.hide
       .col-xs-12
-         a.reset(href="#" ng-click='reset()') reset
+         button.reset(href="#" ng-click='reset()') reset
          &nbsp;
          span.pid PID {{pid}}
          button(ng-click='shutdown()') Shutdown

@@ -2,6 +2,7 @@ int relayPin = 11;
 int thermoDO = 10;
 int thermoCS = 8;
 int thermoCLK = 9;
+int led = 13;
 
 boolean isOn = false;
 int desiredTemp = 210;
@@ -38,6 +39,7 @@ void setup()
 
    delay(1000);
 
+   pinMode(led, OUTPUT);
    pinMode(relayPin, OUTPUT);
    pinMode(thermoCS, OUTPUT);
    pinMode(thermoCLK, OUTPUT);
@@ -104,60 +106,69 @@ int readBit() {
 
 double getThermocoupleTemp()
 {
-   // In case there's an error reading from the TC retry a few times
-   for (int tries = 0; tries < 5; tries++) {
-     // Stop conversion and start a new
-     digitalWrite(thermoCS,LOW);
-     delay(1);
-     digitalWrite(thermoCS,HIGH);
 
-     // Wait for conversion (spec says 220ms but not exactly)
-     delay(230);
+   // Stop conversion and start a new
+   digitalWrite(thermoCS,LOW);
+   delay(1);
+   digitalWrite(thermoCS,HIGH);
 
-     // Start reading data
-     digitalWrite(thermoCS,LOW);
+   // Wait for conversion (spec says 220ms but not exactly)
+   delay(230);
 
-     // (Dummy Bit)
+   // Start reading data
+   digitalWrite(thermoCS,LOW);
+
+   // (Dummy Bit)
+   readBit();
+
+   // 12 bits of Precision (MSB first)
+   int value = 0;
+   for (int i = 11; i >= 0; i--) {
+     value += readBit() << i;
+   }
+
+   // Error bit (Open Input?)
+   int error_tc = readBit();
+
+   // Extra two bits (Device ID and State)
+   for (int i = 0; i < 2; i++) {
      readBit();
+   }
 
-     // 12 bits of Precision (MSB first)
-     int value = 0;
-     for (int i = 11; i >= 0; i--) {
-       value += readBit() << i;
-     }
+   // All done
+   digitalWrite(thermoCS, HIGH);
 
-     // Error bit (Open Input?)
-     int error_tc = readBit();
-
-     // Extra two bits (Device ID and State)
-     for (int i = 0; i < 2; i++) {
-       readBit();
-     }
-
-     // All done
-     digitalWrite(thermoCS, HIGH);
-
-     // Convert C to F
-     if (error_tc == 0) {
-       return (value * 0.25) * 9.0/5.0 + 32.0;
-     }
-
-     delay(100);
+   // Convert C to F
+   if (error_tc == 0) {
+     return (value * 0.25) * 9.0/5.0 + 32.0;
    }
 
    return -255;
 }
 
+void blinkError() {
+   digitalWrite(led, LOW);
+   delay(50);
+   digitalWrite(led, HIGH);
+   delay(50);
+   digitalWrite(led, LOW);
+   delay(50);
+   digitalWrite(led, HIGH);
+}
+
 void determineState(double smokerTemp) {
 
    //if the smokerTemp is too low and the burner is not on
-   if (smokerTemp < desiredTemp) {
+   if (smokerTemp < desiredTemp)
+   {
       isOn = true;
    }
-   else if (smokerTemp < desiredTemp + threshold && smokerTemp > (desiredTemp + (threshold / 2.0)) && !isOn) {
+   else if (smokerTemp < desiredTemp + threshold && smokerTemp > (desiredTemp + (threshold / 2.0)) && !isOn)
+   {
       isOn = true;
    }
-   else if (smokerTemp > desiredTemp + threshold) {
+   else if (smokerTemp > desiredTemp + threshold)
+   {
       isOn = false;
    }
 }
@@ -194,6 +205,12 @@ void loop()
    }
 
    digitalWrite(relayPin, isOn ? HIGH : LOW);
+
+   if (smokerTemp == -255) {
+      blinkError();
+   } else {
+      digitalWrite(led, isOn ? HIGH : LOW);
+   }
 
    writeOutput(smokerTemp);
 }
