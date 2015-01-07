@@ -21,18 +21,8 @@ app.configure(function () {
    }));
 });
 
-var smoker = new Smoker(config);
-
-smoker.start()
-.then(function () {
-   logger.info('Smoker started.');
-   app.set('smoker', smoker);
-   app.set('config', config);
-   require('./routes/index')(app);
-   logger.info('Starting http server on port %d.', app.get('port'));
-   http_server.listen(app.get('port'));
-   logger.info('Server listening on port %d.', app.get('port'));
-})
-.fail(function (e) {
-   logger.error('Unable to start smoker.', e);
-});
+app.set('config', config);
+require('./routes/index')(app);
+logger.info('Starting http server on port %d.', app.get('port'));
+http_server.listen(app.get('port'));
+logger.info('Server listening on port %d.', app.get('port'));

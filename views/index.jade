@@ -8,17 +8,19 @@ block content
                span.started running for&nbsp;
                   span.time(am-time-ago="started_on")
    .row
-      .col-xs-12.col-sm-6(ng-repeat="s in sensors")
+      .col-xs-12(ng-repeat="s in sensors")
          .tile-container
             .info(class="tile-{{$index | letterize}}")
                ul
-                  li
-                     span.temp {{s.temp}}°
-                     i(class="fa fa-fire" ng-if="s.is_primary && s.state == 'on'")
-                     span.title(ng-if='s.is_primary') {{s.goal}}° target
-                  li
-                     span.temp {{s.roc}}°/s
-                     span.title rate
+                  li.values
+                     .value-container
+                        span.temp {{s.temp}}°
+                        i(class="fa fa-fire" ng-if="s.is_primary && s.state == 'on'")
+                        span.title(ng-if='s.is_primary') {{s.target}}° target
+                     .value-container
+                        span.temp {{s.roc}}°/s
+                        span.title rate
+
                   li.graph-container
                      .graph(temp-graph data="s.data" power-data="s.power_data")
                .attrs
@@ -29,7 +31,7 @@ block content
             .config(ng-show="s.show_config")
                form.form(name='config' role='form')
                   .form-group
-                     input.form-control(ng-pattern='/^\\d+$/' name='target_temp' min='0' max='400' type='number' placeholder='Target temperature' ng-model='$parent.target_temp')
+                     input.form-control(ng-pattern='/^\\d+$/' name='target' min='0' max='400' type='number' placeholder='Target temperature' ng-model='$parent.target')
                   .form-group
                      button.btn.btn-default(required type='submit' ng-click='update_config()') Update
    .row.hide

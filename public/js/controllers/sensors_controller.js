@@ -5,8 +5,8 @@ var appControllers = angular.module('appControllers');
 
 var updateSensors = function ($scope, smoker) {
    var sensors = smoker.data.sensors;
-   var target_temp = smoker.info.target_temp;
-   var state = smoker.info.state;
+   var target = smoker.info.target;
+   var power = smoker.info.power;
 
    for (var i = 0; i < $scope.sensors.length; i++) {
       var sensor = $scope.sensors[i];
@@ -18,17 +18,17 @@ var updateSensors = function ($scope, smoker) {
       }
 
       var recent = sensor.data.last(10);
-      var temp_diff = recent.last().value - recent.first().value;
+      var temp_diff = recent.last().temperature - recent.first().temperature;
       var time_diff = Math.abs(recent.first().time - recent.last().time) / 1000;
-      var roc = Math.round(temp_diff / time_diff);
+      var roc = time_diff == 0 ? 0 : Math.round(temp_diff / time_diff);
 
       if (sensor.is_primary) {
-         sensor.state = state;
-         sensor.goal = target_temp;
+         sensor.power = power;
+         sensor.target = target;
       }
 
       sensor.roc = roc > 0 ? ("+" + roc) : roc;
-      sensor.temp = Number(latest_data.value);
+      sensor.temp = Number(latest_data.temperature);
    }
 };
 
@@ -38,15 +38,15 @@ appControllers.controller(
       var time_window = 4 * 60 * 1000;
 
       $scope.update_config = function () {
-         if ($scope.target_temp) {
-            SmokerService.setTargetTemp($scope.target_temp);
+         if ($scope.target) {
+            SmokerService.setTargetTemp($scope.target);
          }
 
          if ($scope.duty_cycle) {
             SmokerService.setDutyCycle($scope.duty_cycle);
          }
 
-         $scope.target_temp = null;
+         $scope.target = null;
          $scope.duty_cycle = null;
       };
 
@@ -77,12 +77,12 @@ appControllers.controller(
          $scope.started_on = history.started_on;
 
          $scope.$on('smoker:update', function (event, smoker) {
-            $scope.pid = smoker.info.pid_state.result;
+            $scope.target = smoker.info.target;
 
-            if ($scope.power_data.last().state !== smoker.info.state) {
+            if ($scope.power_data.last() && $scope.power_data.last().power !== smoker.info.power) {
                $scope.power_data.last().end = smoker.data.time;
                $scope.power_data.push({
-                  state: smoker.info.state,
+                  state: smoker.info.power,
                   start: smoker.data.time
                });
             }
@@ -98,25 +98,25 @@ var getPowerData = function (data) {
    var result = [];
 
    data.forEach(function (d) {
-      if (!d.state) return;
+      if (!d.power) return;
 
-      if (current && current.state !== d.state) {
+      if (current && current.power !== d.power) {
          result.push({
             id: result.length + '_' + 0,
-            state: current.state,
+            state: current.power,
             start: current.start,
             end: d.time
          });
 
          current = {
             start: d.time,
-            state: d.state
+            state: d.power
          };
       }
       else if (!current) {
          current = {
             start: d.time,
-            state: d.state
+            state: d.power
          };
       }
    });

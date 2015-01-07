@@ -21,10 +21,7 @@ appServices.factory(
             cb(Date.now());
          },
          sensors: function (cb) {
-            $io.emit('sensors', function (data) {
-               cb(data);
-            });
-
+            $io.emit('sensors', cb);
          },
          shutdown: function () {
             $io.emit('shutdown');

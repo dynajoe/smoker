@@ -37,7 +37,7 @@ angular.module('appDirectives')
                return x(d.time);
             })
             .y(function (d, i) {
-               return y(d.value);
+               return y(d.temperature);
             });
 
             var svg = d3.select(element[0])
@@ -156,11 +156,11 @@ angular.module('appDirectives')
 
 var getExtent = function (data) {
    var min_value = d3.min(data, function (d) {
-      return d.value;
+      return d.temperature;
    });
 
    var max_value = d3.max(data, function (d) {
-      return d.value;
+      return d.temperature;
    });
 
    max_value = (Math.round(Math.ceil(max_value / 10) * 100)) / 10;
@@ -171,5 +171,5 @@ var getExtent = function (data) {
       min_value = max_value - 30;
    }
 
-   return [min_value, max_value];
+   return [min_value || 0, max_value || 200];
 };

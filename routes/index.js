@@ -1,6 +1,7 @@
 var SystemCommander = require('../lib/system_commander');
 var logger = require('winston');
 var Driver = require('../lib/drivers/automated_driver');
+var Q = require('q');
 
 var Initialize = function (app) {
    var io = app.get('io');
@@ -22,7 +23,8 @@ var Initialize = function (app) {
       });
 
       socket.on('sensors', function (cb) {
-         driver.getSensors().fin(cb);
+         driver.getSensors()
+         .then(cb);
       });
 
       socket.on('command', function (command, value, cb) {
@@ -30,20 +32,28 @@ var Initialize = function (app) {
       });
 
       socket.on('history', function (cb) {
-
          cb({
-            data: smoker.data,
-            started_on: smoker.started_on
+            data: [],
+            started_on: new Date()
          });
       });
    });
 
-   smoker.on('data', function (data) {
-      io.sockets.emit('update', {
-         info: smoker.brains.info(),
-         data: data
+   setInterval(function () {
+      Q.spread([driver.readSensors(), driver.getInfo()],
+      function (sensors, info) {
+         io.sockets.emit('update', {
+            info: info,
+            data: {
+               sensors: sensors
+            },
+            time: Date.now()
+         });
+      })
+      .fail(function (e) {
+         console.log(e);
       });
-   });
+   }, 1000);
 };
 
 module.exports = function (app) {
