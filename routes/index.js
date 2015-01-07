@@ -1,41 +1,36 @@
 var SystemCommander = require('../lib/system_commander');
 var logger = require('winston');
+var Driver = require('../lib/drivers/automated_driver');
 
 var Initialize = function (app) {
    var io = app.get('io');
-   var smoker = app.get('smoker');
    var config = app.get('config');
+
+   var driver = new Driver(config.driver);
+
+   driver.start()
+   .then(function () {
+      io.sockets.emit('started');
+   })
+   .fail(function (e) {
+      io.sockets.emit('error', e);
+   });
 
    io.sockets.on('connection', function (socket) {
       socket.on('time', function (cb) {
          cb(Date.now());
       });
 
-      socket.on('shutdown', function () {
-         logger.info('Shutting down');
-         smoker.stop()
-         .fin(function () {
-            SystemCommander.shutdown();
-         });
-      });
-
-      socket.on('reset', function () {
-         smoker.reset();
-      });
-
-      socket.on('duty_cycle', function (value) {
-         smoker.setDutyCycle(value);
-      });
-
       socket.on('sensors', function (cb) {
-         cb(smoker.getSensors());
+         driver.getSensors().fin(cb);
       });
 
-      socket.on('target_temp', function (value) {
-         smoker.setTargetTemp(value);
+      socket.on('command', function (command, value, cb) {
+         driver.perform(command, value).fin(cb);
       });
 
       socket.on('history', function (cb) {
+
          cb({
             data: smoker.data,
             started_on: smoker.started_on
