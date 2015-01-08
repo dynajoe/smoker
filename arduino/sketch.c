@@ -33,8 +33,7 @@ long readVcc() {
   return result; // Vcc in millivolts
 }
 
-void setup()
-{
+void setup() {
    Serial.begin(9600);
 
    delay(1000);
@@ -62,8 +61,7 @@ char* readToNewLine(int bufferSize, char* buffer) {
    buffer[read] = '\0';
 }
 
-void processCommands()
-{
+void processCommands() {
    const int BufferSize = 20;
 
    if (Serial.available() > 0) {
@@ -75,6 +73,7 @@ void processCommands()
 
       if (command == 's') {
          desiredTemp = atoi(data);
+         Serial.println(desiredTemp);
       }
       else if (command == 't') {
          threshold = atoi(data);
@@ -96,17 +95,16 @@ void processCommands()
    }
 }
 
-int readBit() {
+boolean readBit() {
    digitalWrite(thermoCLK,HIGH);
    delay(1);
-   int value = digitalRead(thermoDO);
+   boolean value = digitalRead(thermoDO);
    digitalWrite(thermoCLK,LOW);
+
    return value;
 }
 
-double getThermocoupleTemp()
-{
-
+double getThermocoupleTemp() {
    // Stop conversion and start a new
    digitalWrite(thermoCS,LOW);
    delay(1);
@@ -157,7 +155,6 @@ void blinkError() {
 }
 
 void determineState(double smokerTemp) {
-
    //if the smokerTemp is too low and the burner is not on
    if (smokerTemp < desiredTemp)
    {
@@ -178,7 +175,7 @@ void writeOutput(double smokerTemp) {
    Serial.print(',');
    Serial.print(smokerTemp);
    Serial.print(',');
-   Serial.print(isOn ? "ON" : "OFF");
+   Serial.print(isOn ? "on" : "off");
    Serial.print(',');
    Serial.print(millis() / 1000L);
    Serial.print(',');
@@ -194,8 +191,7 @@ void writeOutput(double smokerTemp) {
    Serial.println();
 }
 
-void loop()
-{
+void loop() {
    processCommands();
 
    double smokerTemp = getThermocoupleTemp();
