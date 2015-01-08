@@ -6,7 +6,7 @@ var Q = require('q');
 var Initialize = function (app) {
    var io = app.get('io');
    var config = app.get('config');
-
+   var startedOn = new Date();
    var driver = new Driver(config.driver);
 
    driver.start()
@@ -32,9 +32,12 @@ var Initialize = function (app) {
       });
 
       socket.on('history', function (cb) {
-         cb({
-            data: [],
-            started_on: new Date()
+         driver.getHistory()
+         .then(function (history) {
+            return cb({
+               data: history,
+               started_on: startedOn
+            });
          });
       });
    });

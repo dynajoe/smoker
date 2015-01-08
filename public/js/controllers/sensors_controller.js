@@ -67,7 +67,12 @@ appControllers.controller(
 
       SmokerService.initialize(function (sensors, history) {
          $scope.sensors = sensors;
-         $scope.power_data = getPowerData(history.data);
+
+         var primarySensor = sensors.filter(function (s) {
+            return s.is_primary;
+         }).first();
+
+         $scope.power_data = getPowerData(primarySensor, history.data);
 
          $scope.sensors.forEach(function (s) {
             s.data = getHistory(s.name, history.data, time_window);
@@ -79,11 +84,11 @@ appControllers.controller(
          $scope.$on('smoker:update', function (event, smoker) {
             $scope.target = smoker.info.target;
 
-            if ($scope.power_data.last() && $scope.power_data.last().power !== smoker.info.power) {
-               $scope.power_data.last().end = smoker.data.time;
+            if ($scope.power_data.last() && $scope.power_data.last().state !== smoker.info.power) {
+               $scope.power_data.last().end = smoker.info.time;
                $scope.power_data.push({
                   state: smoker.info.power,
-                  start: smoker.data.time
+                  start: smoker.info.time
                });
             }
 
@@ -93,20 +98,20 @@ appControllers.controller(
    }
 ]);
 
-var getPowerData = function (data) {
+var getPowerData = function (primarySensor, history) {
    var current;
    var result = [];
 
-   data.forEach(function (d) {
-      if (!d.power) return;
+   history.forEach(function (x) {
+      var d = x.sensors[primarySensor.name];
 
-      if (current && current.power !== d.power) {
-         result.push({
-            id: result.length + '_' + 0,
-            state: current.power,
-            start: current.start,
-            end: d.time
-         });
+      if (!d || !d.power) return;
+
+      if (current && current.state !== d.power) {
+         current.id = result.length + '_' + 0;
+         current.end = d.time;
+
+         result.push(current);
 
          current = {
             start: d.time,
@@ -131,8 +136,8 @@ var getPowerData = function (data) {
 var getHistory = function (name, data, timespan) {
    var result = [];
    var oldest_time = new Date().getTime() - timespan;
-   for (var i = data.length - 1; i >= 0; i--) {
 
+   for (var i = data.length - 1; i >= 0; i--) {
       var entry = data[i].sensors[name];
 
       if (entry) {

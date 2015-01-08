@@ -12,9 +12,7 @@ appServices.factory(
 
       return {
          history: function (cb) {
-            $io.emit('history', function (data) {
-               cb(data);
-            });
+            $io.emit('history', cb);
          },
          reset: function (cb) {
             $io.emit('reset');
