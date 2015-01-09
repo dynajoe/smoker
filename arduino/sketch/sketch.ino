@@ -61,37 +61,42 @@ char* readToNewLine(int bufferSize, char* buffer) {
    buffer[read] = '\0';
 }
 
+void doCommand(String data) {
+   char command = data.charAt(0);
+
+   if (command == 's' && data.length() > 1) {
+     desiredTemp = data.substring(1).toInt();
+   }
+   else if (command == 't' && data.length() > 1) {
+     threshold = data.substring(1).toInt();
+   }
+   else if (command == 'a') {
+     automatic = true;
+   }
+   else if (command == 'm') {
+     automatic = false;
+   }
+   else if (command == '+') {
+     isOn = true;
+   }
+   else if (command == '-') {
+     isOn = false;
+   }
+}
+
+String Data = "";
+
 void processCommands() {
-   const int BufferSize = 20;
-
-   if (Serial.available() > 0) {
-      char command = Serial.read();
-
-      char* data = (char*) malloc(BufferSize * sizeof(char));
-
-      readToNewLine(BufferSize, data);
-
-      if (command == 's') {
-         desiredTemp = atoi(data);
-         Serial.println(desiredTemp);
+   while (Serial.available()) {
+      char character = Serial.read();
+      if (character == '\n') {
+         Data.trim();
+         doCommand(Data);
+         Data = "";
       }
-      else if (command == 't') {
-         threshold = atoi(data);
+      else {
+         Data.concat(character);
       }
-      else if (command == 'a') {
-         automatic = true;
-      }
-      else if (command == 'm') {
-         automatic = false;
-      }
-      else if (command == '+') {
-         isOn = true;
-      }
-      else if (command == '-') {
-         isOn = false;
-      }
-
-      free(data);
    }
 }
 

@@ -6,6 +6,8 @@ var config = require('./lib/config');
 var Smoker = require('./lib/smoker');
 var logger = require('winston');
 
+logger.setLevels(logger.config.syslog.levels);
+
 logger.info('NODE_ENV: ' + process.env.NODE_ENV);
 
 app.configure(function () {
