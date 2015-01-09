@@ -13,21 +13,16 @@ var updateSensors = function ($scope, smoker) {
       var latest_data = sensors[sensor.name];
 
       sensor.data.push(latest_data);
-      if (sensor.data.length > 200) {
+      if (sensor.data.length > 300) {
          sensor.data.shift();
       }
-
-      var recent = sensor.data.last(10);
-      var temp_diff = recent.last().temperature - recent.first().temperature;
-      var time_diff = Math.abs(recent.first().time - recent.last().time) / 1000;
-      var roc = time_diff == 0 ? 0 : Math.round(temp_diff / time_diff);
 
       if (sensor.is_primary) {
          sensor.power = power;
          sensor.target = target;
       }
 
-      sensor.roc = roc > 0 ? ("+" + roc) : roc;
+      sensor.rate = latest_data.rate > 0 ? ('+' + latest_data.rate) : latest_data.rate;
       sensor.temp = Number(latest_data.temperature);
    }
 };
@@ -35,20 +30,7 @@ var updateSensors = function ($scope, smoker) {
 appControllers.controller(
    'SensorsController', ['$scope', 'SmokerService', 'amMoment',
    function ($scope, SmokerService, amMoment) {
-      var time_window = 4 * 60 * 1000;
-
-      $scope.update_config = function () {
-         if ($scope.target) {
-            SmokerService.setTargetTemp($scope.target);
-         }
-
-         if ($scope.duty_cycle) {
-            SmokerService.setDutyCycle($scope.duty_cycle);
-         }
-
-         $scope.target = null;
-         $scope.duty_cycle = null;
-      };
+      var time_window = 5 * 60 * 1000;
 
       $scope.reset = function () {
          SmokerService.reset(function (started_on) {
@@ -57,10 +39,6 @@ appControllers.controller(
                s.data.length = 0;
             });
          });
-      };
-
-      $scope.shutdown = function () {
-         SmokerService.shutdown();
       };
 
       $scope.form = {};

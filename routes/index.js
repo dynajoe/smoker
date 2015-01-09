@@ -1,4 +1,3 @@
-var SystemCommander = require('../lib/system_commander');
 var logger = require('winston');
 var Driver = require('../lib/drivers/automated_driver');
 //var Driver = require('../lib/drivers/debug_driver');
@@ -62,7 +61,7 @@ var Initialize = function (app) {
       .fail(function (e) {
          console.log(e);
       });
-   }, 1000);
+   }, 500);
 };
 
 module.exports = function (app) {

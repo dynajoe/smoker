@@ -3,11 +3,79 @@ int thermoDO = 10;
 int thermoCS = 8;
 int thermoCLK = 9;
 int led = 13;
+String serialInput = "";
 
 boolean isOn = false;
 int desiredTemp = 210;
 int threshold = 5;
 boolean automatic = true;
+double lastReading = -256;
+long lastReadingTime = 0;
+double rateOfChange = 0.0;
+
+void printFloat(float value, int places) {
+  // this is used to cast digits
+  int digit;
+  float tens = 0.1;
+  int tenscount = 0;
+  int i;
+  float tempfloat = value;
+
+    // make sure we round properly. this could use pow from <math.h>, but doesn't seem worth the import
+  // if this rounding step isn't here, the value  54.321 prints as 54.3209
+
+  // calculate rounding term d:   0.5/pow(10,places)
+  float d = 0.5;
+  if (value < 0)
+    d *= -1.0;
+  // divide by ten for each decimal place
+  for (i = 0; i < places; i++)
+    d/= 10.0;
+  // this small addition, combined with truncation will round our values properly
+  tempfloat +=  d;
+
+  // first get value tens to be the large power of ten less than value
+  // tenscount isn't necessary but it would be useful if you wanted to know after this how many chars the number will take
+
+  if (value < 0)
+    tempfloat *= -1.0;
+  while ((tens * 10.0) <= tempfloat) {
+    tens *= 10.0;
+    tenscount += 1;
+  }
+
+
+  // write out the negative if needed
+  if (value < 0)
+    Serial.print('-');
+
+  if (tenscount == 0)
+    Serial.print(0, DEC);
+
+  for (i=0; i< tenscount; i++) {
+    digit = (int) (tempfloat/tens);
+    Serial.print(digit, DEC);
+    tempfloat = tempfloat - ((float)digit * tens);
+    tens /= 10.0;
+  }
+
+  // if no places after decimal, stop now and return
+  if (places <= 0)
+    return;
+
+  // otherwise, write the point and continue on
+  Serial.print('.');
+
+  // now write out each decimal place by shifting digits one by one into the ones place and writing the truncated value
+  for (i = 0; i < places; i++) {
+    tempfloat *= 10.0;
+    digit = (int) tempfloat;
+    Serial.print(digit,DEC);
+    // once written, subtract off that digit
+    tempfloat = tempfloat - (float) digit;
+  }
+}
+
 
 long readVcc() {
   // Read 1.1V reference against AVcc
@@ -36,7 +104,7 @@ long readVcc() {
 void setup() {
    Serial.begin(9600);
 
-   delay(1000);
+   delay(500);
 
    pinMode(led, OUTPUT);
    pinMode(relayPin, OUTPUT);
@@ -45,20 +113,6 @@ void setup() {
    pinMode(thermoDO, INPUT);
 
    digitalWrite(thermoCS, HIGH);
-}
-
-char* readToNewLine(int bufferSize, char* buffer) {
-   char c;
-   int read = 0;
-
-   while ((c = Serial.read()) != '\n') {
-     if (read < bufferSize) {
-       buffer[read++] = (char) c;
-     }
-     // Throw everything else away
-   }
-
-   buffer[read] = '\0';
 }
 
 void doCommand(String data) {
@@ -84,18 +138,16 @@ void doCommand(String data) {
    }
 }
 
-String Data = "";
-
 void processCommands() {
    while (Serial.available()) {
       char character = Serial.read();
       if (character == '\n') {
-         Data.trim();
-         doCommand(Data);
-         Data = "";
+         serialInput.trim();
+         doCommand(serialInput);
+         serialInput = "";
       }
       else {
-         Data.concat(character);
+         serialInput.concat(character);
       }
    }
 }
@@ -159,32 +211,33 @@ void blinkError() {
    digitalWrite(led, HIGH);
 }
 
-void determineState(double smokerTemp) {
-   //if the smokerTemp is too low and the burner is not on
-   if (smokerTemp < desiredTemp)
-   {
+void determineState(double temp) {
+   // change per second
+   rateOfChange = 1000.0 * (temp - lastReading) / (1.0 * (millis() - lastReadingTime));
+
+   if (temp < desiredTemp) {
       isOn = true;
    }
-   else if (smokerTemp < desiredTemp + threshold && smokerTemp > (desiredTemp + (threshold / 2.0)) && !isOn)
-   {
-      isOn = true;
-   }
-   else if (smokerTemp > desiredTemp + threshold)
-   {
+   else if (temp > desiredTemp + threshold) {
       isOn = false;
    }
+
+   lastReading = temp;
+   lastReadingTime = millis();
 }
 
 void writeOutput(double smokerTemp) {
-   Serial.print(automatic ? 'A' : 'M');
+   Serial.print(automatic ? 'A' : 'M'); //0
    Serial.print(',');
-   Serial.print(smokerTemp);
+   Serial.print(smokerTemp); //1
    Serial.print(',');
-   Serial.print(isOn ? "on" : "off");
+   printFloat(rateOfChange, 3); //2
    Serial.print(',');
-   Serial.print(millis() / 1000L);
+   Serial.print(isOn ? "on" : "off"); //3
    Serial.print(',');
-   Serial.print(readVcc() / 1000.0);
+   Serial.print(millis() / 1000L); //4
+   Serial.print(',');
+   Serial.print(readVcc() / 1000.0); //5
 
    if (automatic) {
      Serial.print(',');
@@ -215,3 +268,5 @@ void loop() {
 
    writeOutput(smokerTemp);
 }
+
+

@@ -15,16 +15,17 @@ block content
                   li.values
                      .value-container
                         span.temp {{s.temp}}°
-                        i(class="fa fa-fire" ng-if="s.is_primary && s.power == 'on'")
                         span.title(ng-if='s.is_primary') {{s.target}}° target
+                        span.title(ng-if='s.is_primary') {{s.threshold}}° threshold
                      .value-container
-                        span.temp {{s.roc}}°/s
+                        span.temp {{s.rate}}°/s
                         span.title rate
 
                   li.graph-container
                      .graph(temp-graph data="s.data" power-data="s.power_data")
                .attrs
-                  span.name {{s.name}}
+                  span.name {{s.name}}&nbsp;
+                     i(class="fa fa-fire" ng-if="s.is_primary && s.power == 'on'")
 
                a(href="#" ng-click="s.show_config=!s.show_config" ng-if="s.is_primary")
                   i(class="fa fa-cog")
