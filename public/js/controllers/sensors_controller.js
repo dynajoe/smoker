@@ -63,10 +63,23 @@ appControllers.controller(
          SmokerService.shutdown();
       };
 
+      $scope.form = {};
+
+      $scope.sendCommands = function () {
+         for (var k in $scope.form) {
+            SmokerService.perform(k, $scope.form[k], function () {
+
+            });
+         }
+
+         $scope.form = {};
+      };
+
       $scope.power_data = [];
 
-      SmokerService.initialize(function (sensors, history) {
+      SmokerService.initialize(function (sensors, commands, history) {
          $scope.sensors = sensors;
+         $scope.commands = commands;
 
          var primarySensor = sensors.filter(function (s) {
             return s.is_primary;

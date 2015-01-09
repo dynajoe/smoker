@@ -1,6 +1,7 @@
 var SystemCommander = require('../lib/system_commander');
 var logger = require('winston');
-var Driver = require('../lib/drivers/automated_driver');
+//var Driver = require('../lib/drivers/automated_driver');
+var Driver = require('../lib/drivers/debug_driver');
 var Q = require('q');
 
 var Initialize = function (app) {
@@ -27,7 +28,12 @@ var Initialize = function (app) {
          .then(cb);
       });
 
-      socket.on('command', function (command, value, cb) {
+      socket.on('commands', function (cb) {
+         driver.getCommands()
+         .then(cb);
+      });
+
+      socket.on('perform', function (command, value, cb) {
          driver.perform(command, value).fin(cb);
       });
 
