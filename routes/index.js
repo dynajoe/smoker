@@ -1,54 +1,66 @@
-var SystemCommander = require('../lib/system_commander');
 var logger = require('winston');
+var Driver = require('../lib/drivers/automated_driver');
+var Q = require('q');
 
 var Initialize = function (app) {
    var io = app.get('io');
-   var smoker = app.get('smoker');
    var config = app.get('config');
+   var startedOn = new Date();
+   var driver = new Driver(config.driver);
+
+   driver.start()
+   .then(function () {
+      io.sockets.emit('started');
+   })
+   .fail(function (e) {
+      io.sockets.emit('error', e);
+   });
 
    io.sockets.on('connection', function (socket) {
       socket.on('time', function (cb) {
          cb(Date.now());
       });
 
-      socket.on('shutdown', function () {
-         logger.info('Shutting down');
-         smoker.stop()
-         .fin(function () {
-            SystemCommander.shutdown();
-         });
-      });
-
-      socket.on('reset', function () {
-         smoker.reset();
-      });
-
-      socket.on('duty_cycle', function (value) {
-         smoker.setDutyCycle(value);
-      });
-
       socket.on('sensors', function (cb) {
-         cb(smoker.getSensors());
+         driver.getSensors()
+         .then(cb);
       });
 
-      socket.on('target_temp', function (value) {
-         smoker.setTargetTemp(value);
+      socket.on('commands', function (cb) {
+         driver.getCommands()
+         .then(cb);
+      });
+
+      socket.on('perform', function (command, value, cb) {
+         driver.perform(command, value).fin(cb);
       });
 
       socket.on('history', function (cb) {
-         cb({
-            data: smoker.data,
-            started_on: smoker.started_on
+         driver.getHistory()
+         .then(function (history) {
+            return cb({
+               data: history,
+               started_on: startedOn
+            });
          });
       });
    });
 
-   smoker.on('data', function (data) {
-      io.sockets.emit('update', {
-         info: smoker.brains.info(),
-         data: data
+   setInterval(function () {
+      Q.spread([driver.readSensors(), driver.getInfo()],
+      function (sensors, info) {
+         io.sockets.emit('update', {
+            info: info,
+            data: {
+               sensors: sensors
+            },
+            time: Date.now()
+         });
+      })
+      .fail(function (e) {
+         console.log(e);
       });
-   });
+   }, 500);
 };
 
 module.exports = function (app) {

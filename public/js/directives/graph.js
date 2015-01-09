@@ -12,7 +12,7 @@ angular.module('appDirectives')
       },
       link: function ($scope, element, attrs) {
          d3Service.d3().then(function (d3) {
-            var update_rate = 1500;
+            var update_rate = 100;
             var now = Date.now();
 
             var width = parseInt(d3.select(element[0]).style('width'), 10);
@@ -37,7 +37,7 @@ angular.module('appDirectives')
                return x(d.time);
             })
             .y(function (d, i) {
-               return y(d.value);
+               return y(d.temperature);
             });
 
             var svg = d3.select(element[0])
@@ -58,10 +58,24 @@ angular.module('appDirectives')
                   .attr('width', width - margin.left - margin.right)
                   .attr('height', height - margin.top - margin.bottom);
 
+            //TODO: Convert to using auto resizing svg in viewbox
+            window.onresize = function () {
+               var width = parseInt(d3.select(element[0]).style('width'), 10);
+
+               svg.attr('width', width - margin.left - margin.right);
+
+               x.range([margin.left, width]);
+
+               axis.transition()
+                  .duration(0)
+                  .ease('linear')
+                  .call(x.axis);
+            };
+
             var axis = svg.append('g')
                .attr('class', 'x axis')
                .attr('transform', 'translate(0,' + (height - margin.bottom) + ')')
-               .call(x.axis = d3.svg.axis().scale(x).orient('bottom').ticks(10));
+               .call(x.axis = d3.svg.axis().scale(x).orient('bottom').ticks(5));
 
             var y_axis = svg.append('g')
                .attr('class', 'y axis')
@@ -80,6 +94,7 @@ angular.module('appDirectives')
                var now = Date.now();
 
                var step_size = (x(now) - x(now - update_rate));
+               var width = parseInt(d3.select(element[0]).style('width'), 10);
 
                x.domain([now - timespan, now]);
 
@@ -156,11 +171,11 @@ angular.module('appDirectives')
 
 var getExtent = function (data) {
    var min_value = d3.min(data, function (d) {
-      return d.value;
+      return d.temperature;
    });
 
    var max_value = d3.max(data, function (d) {
-      return d.value;
+      return d.temperature;
    });
 
    max_value = (Math.round(Math.ceil(max_value / 10) * 100)) / 10;
@@ -171,5 +186,5 @@ var getExtent = function (data) {
       min_value = max_value - 30;
    }
 
-   return [min_value, max_value];
+   return [min_value || 0, max_value || 200];
 };

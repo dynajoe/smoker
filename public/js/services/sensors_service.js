@@ -12,36 +12,34 @@ appServices.factory(
 
       return {
          history: function (cb) {
-            $io.emit('history', function (data) {
-               cb(data);
-            });
+            $io.emit('history', cb);
          },
          reset: function (cb) {
             $io.emit('reset');
             cb(Date.now());
          },
+         perform: function (command, parameter, cb) {
+            $io.emit('perform', command, parameter, cb);
+         },
          sensors: function (cb) {
-            $io.emit('sensors', function (data) {
-               cb(data);
-            });
-
+            $io.emit('sensors', cb);
+         },
+         commands: function (cb) {
+            $io.emit('commands', cb);
          },
          shutdown: function () {
             $io.emit('shutdown');
          },
          initialize: function (cb) {
-            this.history(function (history) {
-               this.sensors(function (sensors) {
-                  cb(sensors, history);
+            var svc = this;
+            svc.history(function (history) {
+               svc.sensors(function (sensors) {
+                  svc.commands(function (commands) {
+                     cb(sensors, commands, history);
+                  });
                });
-            }.bind(this));
+            });
          },
-         setTargetTemp: function (value) {
-            $io.emit('target_temp', value);
-         },
-         setDutyCycle: function (value) {
-            $io.emit('duty_cycle', value);
-         }
       };
    }
 ]);
