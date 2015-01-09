@@ -15,7 +15,7 @@ block content
                   li.values
                      .value-container
                         span.temp {{s.temp}}°
-                        i(class="fa fa-fire" ng-if="s.is_primary && s.state == 'on'")
+                        i(class="fa fa-fire" ng-if="s.is_primary && s.power == 'on'")
                         span.title(ng-if='s.is_primary') {{s.target}}° target
                      .value-container
                         span.temp {{s.roc}}°/s
@@ -29,9 +29,9 @@ block content
                a(href="#" ng-click="s.show_config=!s.show_config" ng-if="s.is_primary")
                   i(class="fa fa-cog")
             .config(ng-show="s.show_config")
-               form.form(name='config' role='form')
-                  .form-group
-                     input.form-control(ng-pattern='/^\\d+$/' name='target' min='0' max='400' type='number' placeholder='Target temperature' ng-model='$parent.target')
+               form.form(name='config' role='form' ng-submit='sendCommands()')
+                  .form-group(ng-repeat="c in $parent.commands")
+                     input.form-control(ng-attr-name='{{c.command}}' ng-attr-placeholder='{{c.display_name}}' ng-model="$parent.form[c.command]")
                   .form-group
                      button.btn.btn-default(required type='submit' ng-click='update_config()') Update
    .row.hide
