@@ -53,6 +53,18 @@ appControllers.controller(
          $scope.form = {};
       };
 
+      $scope.form = {};
+
+      $scope.sendCommands = function () {
+         for (var k in $scope.form) {
+            SmokerService.perform(k, $scope.form[k], function () {
+
+            });
+         }
+
+         $scope.form = {};
+      };
+
       $scope.power_data = [];
 
       SmokerService.initialize(function (sensors, commands, history) {

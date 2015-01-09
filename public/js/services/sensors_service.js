@@ -39,7 +39,7 @@ appServices.factory(
                   });
                });
             });
-         }
+         },
       };
    }
 ]);

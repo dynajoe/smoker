@@ -1,6 +1,5 @@
 var logger = require('winston');
 var Driver = require('../lib/drivers/automated_driver');
-//var Driver = require('../lib/drivers/debug_driver');
 var Q = require('q');
 
 var Initialize = function (app) {
