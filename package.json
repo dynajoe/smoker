@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "dependencies": {
     "connect-assets": "3.0.1",
-    "express": "3.0.4",
+    "express": "4.17.1",
     "gpio": "0.2.5",
     "jade": "*",
     "nib": "~1.0.2",
